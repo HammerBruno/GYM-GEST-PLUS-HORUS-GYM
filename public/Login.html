@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="assets/style2.css">
+</head>
+<body>
+
+<div id="Lanavbar"></div>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+ 
+  <div class="container">
+    <div class="left-side"></div> 
+
+    <div class="right-side">
+      <div class="logo-text">
+        <div class="circle">
+          <!--URL de logo-->
+          <img src="https://copilot.microsoft.com/th/id/BCO.adf5751a-1b5d-4945-adb9-858edfbfa928.png" alt="Logo Gym" />
+        </div>
+        <span>Horus</span>
+      </div>
+
+      <div class="form-container">
+        <h2>Bienvenido de vuelta</h2>
+
+        <!-- Login (visible al inicio) -->
+        <form id="login-form">
+          <input type="text" id="username" placeholder="usuario" required />
+          <input type="password" id="password" placeholder="Contraseña" required />
+          <div class="password-container">
+            <span class="password-toggle" onclick="togglePassword('password', this)">Mostrar contraseña</span>
+          </div>
+          <button type="submit">Iniciar sesión</button>
+          <span class="toggle-link" onclick="mostrarRecuperar()">¿Olvidaste tu contraseña?</span>
+          <button type="button" onclick="mostrarRegistro()">Regístrate</button>
+          <p id="login-msg"></p>
+        </form>
+
+        <!-- Registro (oculto al inicio) -->
+        <form id="registro-form" class="oculto">
+          <input type="text" name="nombre" id="nombre" placeholder="Nombre completo" required />
+          <input type="email" name="email" id="email" placeholder="Correo electrónico" required />
+          <input type="text" name="user" id="user" placeholder="Usuario" required />
+          <input type="password" name="password" id="password" placeholder="Contraseña" required />
+          <div class="password-container">
+        <!--    <span class="password-toggle" onclick="togglePassword('reg-password', this)">Mostrar contraseña</span>-->
+          </div>
+          <button type="submit">Registrarse</button>
+          <span class="toggle-link" onclick="mostrarLogin()">¿Ya tienes cuenta? Inicia sesión</span>
+          <p id="registro-msg"></p>
+        </form>
+
+        <!-- Recuperar contraseña (oculto al inicio) -->
+        <form id="recuperar-form" class="oculto">
+          <input type="email" placeholder="Correo electrónico" required />
+          <button type="submit">Recuperar contraseña</button>
+          <span class="toggle-link" onclick="mostrarLogin()">Volver al inicio</span>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script type="module">
+    import {cargarNavBar} from "./js/layout.js";
+    cargarNavBar();
+  </script>
+</body>
+</html>

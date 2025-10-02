@@ -1,0 +1,185 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom right, #000000, #2c0e0e);
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  max-width: 1000px;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #1c1c1c;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+  height: 85vh;
+  max-height: 600px;
+  margin-top: -70px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
+    height: 500px;
+  }
+}
+
+.left-side {
+  flex: 1;
+  background: url('https://images.pexels.com/photos/1431282/pexels-photo-1431282.jpeg') center/cover no-repeat;
+  min-height: 300px;
+}
+
+
+.right-side {
+  flex: 1;
+  background: linear-gradient(to bottom right, #1c1c1c, #2c0e0e);
+  color: #f5f5f5;
+  padding: 70px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.logo-text {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text span {
+  font-size: 1rem;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.logo-text .circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #f00; /*rojo detrás*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* evita que la imagen se salga del círculo */
+}
+
+.logo-text .circle img {
+  width: 80%;    /* ocupa el 80% del círculo */
+  height: 80%;
+  object-fit: cover; /* ajusta la imagen dentro del círculo */
+  border-radius: 50%; /* redondea la imagen */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  font-size: 1.6em;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 25px;
+  background-color: #2e2e2e;
+  color: #fff;
+  font-size: 1em;
+}
+
+input::placeholder {
+  color: #999;
+}
+
+.password-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
+
+.password-toggle {
+  font-size: 1em;
+  color: #f88;
+  cursor: pointer;
+  user-select: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.toggle-link {
+  display: block;
+  margin-top: 8px;
+  color: #f88;
+  font-size: 0.9em;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#registro-form input {
+  margin: 6px 0;
+  padding: 8px;
+}
+
+#registro-form button,
+#registro-form .toggle-link {
+  margin-top: 14px;
+}
+
+/* Ocultar formularios con animación */
+form {
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+form.oculto {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
