@@ -1,3 +1,4 @@
+/*el backend*/
 const express = require ('express');
 const cors = require ('cors');
 const path = require ('path');
@@ -5,6 +6,8 @@ const db = require ('./db');
 const { message } = require('statuses');
 const bcrypt = require ('bcrypt');
 const app = express();
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 
 app.use(cors());
@@ -12,6 +15,88 @@ app.use(cors());
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname,'public')));
+/*correo*/
+
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'horusgymserviceemail@gmail.com',
+        pass: 'tztu zmay kswc jdwt' // usar app password
+    }
+});
+
+/* Recuperar contraseña */
+app.post('/api/forgot', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'El campo email es obligatorio' 
+        });
+    }
+
+    const sql = 'SELECT * FROM entrenador WHERE Correo = ?';
+    db.query(sql, [email], async (err, result) => {
+        if (err) {
+            console.error('Error en la consulta SQL', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Error interno en la base de datos' 
+            });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'El correo no está registrado' 
+            });
+        }
+
+        // Generar token y guardar
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiration = Date.now() + 3600000; // 1 hora
+        const updateSql = 'UPDATE entrenador SET reset_token = ?, token_expiry = ? WHERE Correo = ?';
+
+        db.query(updateSql, [token, expiration, email], (err) => {
+            if (err) {
+                console.error('Error al guardar el token', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'No se pudo generar el enlace de recuperación' 
+                });
+            }
+
+            // Configurar correo
+            const mailOptions = {
+                from: 'horusgymserviceemail@gmail.com',
+                to: email,
+                subject: 'Recuperación de contraseña',
+                html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+                       <a href="http://localhost:3000/reset.html?token=${token}">Restablecer contraseña</a>`
+            };
+
+            transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    console.error('Error al enviar el correo', err);
+                    return res.status(500).json({ 
+                        success: false, 
+                        message: 'No se pudo enviar el correo de recuperación' 
+                    });
+                }
+
+                // ✅ Mensaje de éxito final
+                return res.status(200).json({ 
+                    success: true, 
+                    message: 'Se ha enviado un correo con instrucciones para restablecer tu contraseña' 
+                });
+            });
+        });
+    });
+});
+
+
+    
 
 
 
@@ -21,41 +106,32 @@ app.get('/api/saludo', (req, res)=>{
 });
 
 // login api//
-app.post('/api/login',(req, res)=>{
-    
-    const {usuario,password}=req.body;
-    if (!usuario||!password){
-        return res.status(400).json({
-            message: 'Todos lo campos tienen que ser obligatorios'
-        });
+app.post('/api/login', async (req, res) => {
+    const {usuario, password} = req.body;
+    if (!usuario || !password) {
+        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
-   
-    const sql='SELECT * FROM entrenador WHERE username = ? ';
 
-    db.query(sql,[usuario],(err,result)=>{
-        if(err){
-            console.error('Error al iniciar sesion',err);
-            return res.status(500).json({
-            message:'Error al iniciar sesion'
-        });
+    const sql = 'SELECT * FROM entrenador WHERE username = ?';
+    db.query(sql, [usuario], async (err, result) => {
+        if (err) {
+            console.error('Error al iniciar sesión', err);
+            return res.status(500).json({ message: 'Error al iniciar sesión' });
         }
-        
-        
-        const user= result[0];
 
-        const isMatch= bcrypt.compare (password, user.password);
+        const user = result[0];
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
 
-        if (!isMatch) return res.status(401).json({
-            success: false,
-            message: 'Contraseña incorrecta'
-        });
-        //console.log('registro correcto');
-        res.status(201).json({
-            message:'inicio correcto'
-        });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+        }
+
+        res.status(200).json({ message: 'Inicio correcto' });
     });
 });
-
     
 // registro api//
 

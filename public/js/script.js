@@ -33,8 +33,8 @@ function togglePassword(id, element) {
 document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const usuario = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const usuario = document.getElementById("log-username").value;
+  const password = document.getElementById("log-password").value;
   const msg = document.getElementById("login-msg");
 
   try {
@@ -90,3 +90,5 @@ document.getElementById("registro-form").addEventListener("submit", async (e) =>
     msg.textContent = "Error en conexión";
   }
 });
+//forgot//
+

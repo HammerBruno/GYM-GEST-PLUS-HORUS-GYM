@@ -29,13 +29,13 @@
 
         <!-- Login (visible al inicio) -->
         <form id="login-form">
-          <input type="text" id="username" placeholder="usuario" required />
-          <input type="password" id="password" placeholder="Contraseña" required />
+          <input type="text" id="log-username" placeholder="Usuario" required />
+          <input type="password" id="log-password" placeholder="Contraseña" required />
           <div class="password-container">
             <span class="password-toggle" onclick="togglePassword('password', this)">Mostrar contraseña</span>
           </div>
           <button type="submit">Iniciar sesión</button>
-          <span class="toggle-link" onclick="mostrarRecuperar()">¿Olvidaste tu contraseña?</span>
+          <span class="toggle-link" onclick="window.location.href='forgot.html'">¿Olvidaste tu contraseña?</span>
           <button type="button" onclick="mostrarRegistro()">Regístrate</button>
           <p id="login-msg"></p>
         </form>
