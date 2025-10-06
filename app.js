@@ -129,7 +129,8 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
         }
 
-        res.status(200).json({ message: 'Inicio correcto' });
+        res.status(200).json({ success:true,
+            user: {id: user.id_entrenador, nombre: user.Nombre_Entrenador}, message: 'Inicio correcto' });
     });
 });
     
@@ -158,8 +159,8 @@ app.post('/api/registro',(req,res)=>{
     });
 });
 
-// Registrar nuevo entrenador
-app.post('/api/registro', (req, res) => {
+// crud
+/*app.post('/api/crud', (req, res) => {
   const { nombre, correo, usuario, password } = req.body;
   if (!nombre || !correo || !usuario || !password) {
     return res.status(400).json({
@@ -176,14 +177,14 @@ app.post('/api/registro', (req, res) => {
     }
     res.status(201).json({ message: 'Registro correcto', id: result.insertId });
   });
-});
+});*/
 
 // Crear entrenador (alias de registro, si quieres mantenerlo separado)
 app.post("/api/entrenadores", (req, res) => {
-  const { nombre, correo, usuario, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const { agregarnombre, agregarcorreo, agregarsuario, agregarpassword } = req.body;
+  const hashedPassword = bcrypt.hashSync(agregarpassword, 10);
   const sql = "INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)";
-  db.query(sql, [nombre, correo, usuario, hashedPassword], (err, result) => {
+  db.query(sql, [agregarnombre, agregarcorreo, agregarusuario, hashedPassword], (err, result) => {
     if (err) return res.status(500).json({ success: false, message: "Error al crear entrenador" });
     res.status(201).json({ success: true, message: "Entrenador creado", id: result.insertId });
   });
@@ -198,30 +199,30 @@ app.get("/api/entrenadores", (req, res) => {
 });
 
 // Leer un entrenador por id
-app.get("/api/entrenadores/:id", (req, res) => {
-  const { id } = req.params;
-  db.query("SELECT * FROM entrenador WHERE id = ?", [id], (err, results) => {
+app.get("/api/entrenadores/:id_entrenador", (req, res) => {
+  const { id_entrenador } = req.params;
+  db.query("SELECT * FROM entrenador WHERE id_entrenador = ?", [id_entrenador], (err, results) => {
     if (err) return res.status(500).json({ success: false, message: "Error al obtener entrenador" });
     res.json(results[0]);
   });
 });
 
 // Actualizar entrenador
-app.put("/api/entrenadores/:id", (req, res) => {
-  const { id } = req.params;
-  const { nombre, correo, usuario, password } = req.body;
+app.put("/api/entrenadores/:id_entrenador", (req, res) => {
+  const { id_entrenador } = req.params;
+  const { editarnombrecompleto, editarcorreo, editarusuario, editarpassword } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ?, password = ? WHERE id = ?";
-  db.query(sql, [nombre, correo, usuario, hashedPassword, id], (err) => {
+  const sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ?, password = ? WHERE id_entrenador = ?";
+  db.query(sql, [editarnombre, editarcorreo, editarusuario, hashedPassword, id_entrenador], (err) => {
     if (err) return res.status(500).json({ success: false, message: "Error al actualizar entrenador" });
     res.json({ success: true, message: "Entrenador actualizado" });
   });
 });
 
 // Eliminar entrenador
-app.delete("/api/entrenadores/:id", (req, res) => {
-  const { id } = req.params;
-  db.query("DELETE FROM entrenador WHERE id = ?", [id], (err) => {
+app.delete("/api/entrenadores/:id_entrenador", (req, res) => {
+  const { id_entrenador } = req.params;
+  db.query("DELETE FROM entrenador WHERE id_entrenador = ?", [id_entrenador], (err) => {
     if (err) return res.status(500).json({ success: false, message: "Error al eliminar entrenador" });
     res.json({ success: true, message: "Entrenador eliminado" });
   });

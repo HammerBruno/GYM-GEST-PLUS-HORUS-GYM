@@ -1,6 +1,6 @@
 // Cargar usuarios
 function cargausuarios() {
-  fetch("/api/usuarios")
+  fetch("/api/entrenadores")
     .then(res => res.json())
     .then(data => {
       const tabla = document.getElementById("tablausuarios");
@@ -8,13 +8,13 @@ function cargausuarios() {
       data.forEach(u => {
         tabla.innerHTML += `
           <tr>
-            <td>${u.nombre}</td>
-            <td>${u.usuario}</td>
-            <td>${u.correo}</td>
+            <td>${u.Nombre_Entrenador}</td>
+            <td>${u.username}</td>
+            <td>${u.Correo}</td>
             <td>${u.password}</td>
             <td>
-              <button class="btn btn-warning btn-sm" onclick="editarusuario(${u.id})">Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarusuario(${u.id})">Eliminar</button>
+              <button class="btn btn-warning btn-sm" onclick="editarusuario(${u.id_entrenador})">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarusuario(${u.id_entrenador})">Eliminar</button>
             </td>
           </tr>
         `;
@@ -27,7 +27,7 @@ document.getElementById("formagregar").addEventListener("submit", e => {
   e.preventDefault();
   const form = e.target;
   const datos = Object.fromEntries(new FormData(form));
-  fetch("/api/usuarios", {
+  fetch("/api/entrenadores", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datos)
@@ -39,8 +39,8 @@ document.getElementById("formagregar").addEventListener("submit", e => {
 });
 
 // Editar usuario
-function editarusuario(id) {
-  fetch(`/api/usuarios/${id}`)
+function editarusuario(id_entrenador) {
+  fetch(`/api/entrenadores/${id_entrenador}`)
     .then(res => res.json())
     .then(usuario => {
       document.getElementById("editarnombrecompleto").value = usuario.nombre;
@@ -59,7 +59,7 @@ document.getElementById("formeditar").addEventListener("submit", e => {
   const datos = Object.fromEntries(new FormData(form));
   const id = datos.id;
 
-  fetch(`/api/usuarios/${id}`, {
+  fetch(`/api/entrenadores/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datos)
@@ -70,9 +70,11 @@ document.getElementById("formeditar").addEventListener("submit", e => {
 });
 
 // Eliminar usuario
-function eliminarusuario(id) {
+function eliminarusuario(id_entrenador) {
   if (confirm("¿Eliminar este usuario?")) {
-    fetch(`/api/usuarios/${id}`, { method: "DELETE" })
+    fetch(`/api/entrenadores/${id_entrenador}`, { method: "DELETE" })
       .then(() => cargausuarios());
   }
 }
+
+cargausuarios();
