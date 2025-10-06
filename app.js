@@ -215,14 +215,28 @@ app.get("/api/entrenadores/:id_entrenador", (req, res) => {
 // Actualizar entrenador
 app.put("/api/entrenadores/:id_entrenador", (req, res) => {
   const { id_entrenador } = req.params;
-  const { editarnombrecompleto, editarcorreo, editarusuario, editarpassword } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  const sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ?, password = ? WHERE id_entrenador = ?";
-  db.query(sql, [editarnombre, editarcorreo, editarusuario, hashedPassword, id_entrenador], (err) => {
-    if (err) return res.status(500).json({ success: false, message: "Error al actualizar entrenador" });
+  const { editarnombrecompleto, editarcorreo, editaruser, editarpassword } = req.body;
+
+  let sql, params;
+
+  if (editarpassword && editarpassword.trim() !== "") {
+    const hashedPassword = bcrypt.hashSync(editarpassword, 10);
+    sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ?, password = ? WHERE id_entrenador = ?";
+    params = [editarnombrecompleto, editarcorreo, editaruser, hashedPassword, id_entrenador];
+  } else {
+    sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ? WHERE id_entrenador = ?";
+    params = [editarnombrecompleto, editarcorreo, editaruser, id_entrenador];
+  }
+
+  db.query(sql, params, (err) => {
+    if (err) {
+      console.error("Error al actualizar:", err);
+      return res.status(500).json({ success: false, message: "Error al actualizar entrenador" });
+    }
     res.json({ success: true, message: "Entrenador actualizado" });
   });
 });
+
 
 // Eliminar entrenador
 app.delete("/api/entrenadores/:id_entrenador", (req, res) => {

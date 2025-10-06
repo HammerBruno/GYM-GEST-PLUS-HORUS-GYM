@@ -23,10 +23,29 @@ function cargausuarios() {
 }
 
 // Agregar usuario
-document.getElementById("formagregar").addEventListener("submit", e => {
-  e.preventDefault();
+document.getElementById("formagregar").addEventListener("submit", async e => {
+  e.preventDefault(); // <-- evita que el formulario se envíe
+
   const form = e.target;
   const datos = Object.fromEntries(new FormData(form));
+
+  // Validar que el campo no esté vacío
+  if (!datos.agregaruser || datos.agregaruser.trim() === "") {
+    alert("El nombre de usuario no puede estar vacío.");
+    return; // <-- TERMINA la función aquí, no sigue al fetch
+  }
+
+  // Consultar usuarios para validar duplicado
+  const usuarios = await fetch("/api/entrenadores").then(res => res.json());
+
+  const yaExiste = usuarios.some(u => u.username === datos.agregaruser);
+
+  if (yaExiste) {
+    alert("Ese nombre de usuario ya está en uso. Elige otro.");
+    return; // <-- TERMINA la función aquí, no sigue al fetch
+  }
+
+  // Si pasó todas las validaciones, continúa con la petición POST
   fetch("/api/entrenadores", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,36 +57,69 @@ document.getElementById("formagregar").addEventListener("submit", e => {
   });
 });
 
+
 // Editar usuario
 function editarusuario(id_entrenador) {
   fetch(`/api/entrenadores/${id_entrenador}`)
     .then(res => res.json())
     .then(usuario => {
-      document.getElementById("editarnombrecompleto").value = usuario.nombre;
-      document.getElementById("editaruser").value = usuario.user;
-      document.getElementById("editarcorreo").value = usuario.correo;
+      document.getElementById("editarnombrecompleto").value = usuario.Nombre_Entrenador;
+      document.getElementById("editaruser").value = usuario.username;
+      document.getElementById("editarcorreo").value = usuario.Correo;
       document.getElementById("editarpassword").value = '';
+      document.getElementById("editarid").value = id_entrenador;
 
+
+      
       const modal = new bootstrap.Modal(document.getElementById("modaleditar"));
       modal.show();
     });
 }
 
-document.getElementById("formeditar").addEventListener("submit", e => {
+document.getElementById("formeditar").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
   const datos = Object.fromEntries(new FormData(form));
-  const id = datos.id;
+  const id_entrenador = datos.id_entrenador;
 
-  fetch(`/api/entrenadores/${id}`, {
+  // Validar que el campo no esté vacío
+  if (!datos.editaruser || datos.editaruser.trim() === "") {
+    alert("El nombre de usuario no puede estar vacío.");
+    return; // <-- TERMINA la función aquí, no sigue al fetch
+  }
+
+  // Consultar usuarios para validar duplicado
+  const usuarios = await fetch("/api/entrenadores").then(res => res.json());
+
+  const yaExiste = usuarios.some(u => u.username === datos.agregaruser);
+
+  if (yaExiste) {
+    alert("Ese nombre de usuario ya está en uso. Elige otro.");
+    return; // <-- TERMINA la función aquí, no sigue al fetch
+  }
+
+
+  // Si el password está vacío, eliminarlo para no enviarlo
+  if (!datos.editarpassword || datos.editarpassword.trim() === "") {
+    delete datos.editarpassword;
+  }
+
+  // Enviar la solicitud al backend
+  fetch(`/api/entrenadores/${id_entrenador}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datos)
-  }).then(() => {
+  }).then(res => {
+    if (!res.ok) {
+      alert("Hubo un problema al actualizar.");
+      return;
+    }
+
     bootstrap.Modal.getInstance(document.getElementById("modaleditar")).hide();
     cargausuarios();
   });
 });
+
 
 // Eliminar usuario
 function eliminarusuario(id_entrenador) {

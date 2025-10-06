@@ -38,6 +38,7 @@
           <input type="text" name="agregaruser" id="agregaruser" class="form-control mb-2" placeholder="Usuario" required>
           <input type="email" name="agregarcorreo" id="agregarcorreo" class="form-control mb-2" placeholder="Correo" required>
           <input type="password" name="agregarpassword" id="agregarpassword" class="form-control mb-2" placeholder="Contraseña" required>
+
         </div>
         <div class="modal-footer">
           <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
@@ -55,6 +56,7 @@
           <h5 class="modal-title">Editar usuario</h5>
         </div>
         <div class="modal-body">
+          <input type="hidden" name="id_entrenador" id="editarid">
           <input type="text" name="editarnombrecompleto" id="editarnombrecompleto" class="form-control mb-2" placeholder="Nombre completo" required>
           <input type="text" name="editaruser" id="editaruser" class="form-control mb-2" placeholder="Usuario" required>
           <input type="email" name="editarcorreo" id="editarcorreo" class="form-control mb-2" placeholder="Correo" required>
