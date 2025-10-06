@@ -55,7 +55,7 @@ app.post('/api/forgot', async (req, res) => {
 
         // Generar token y guardar
         const token = crypto.randomBytes(32).toString('hex');
-        const expiration = Date.now() + 3600000; // 1 hora
+        const expiration = new Date(Date.now() + 3600000).toISOString().slice(0, 19).replace('T', ' '); // 1 hora
         const updateSql = 'UPDATE entrenador SET reset_token = ?, token_expiry = ? WHERE Correo = ?';
 
         db.query(updateSql, [token, expiration, email], (err) => {
