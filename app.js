@@ -157,6 +157,75 @@ app.post('/api/registro',(req,res)=>{
         });
     });
 });
+
+// Registrar nuevo entrenador
+app.post('/api/registro', (req, res) => {
+  const { nombre, correo, usuario, password } = req.body;
+  if (!nombre || !correo || !usuario || !password) {
+    return res.status(400).json({
+      message: 'Todos los campos son obligatorios'
+    });
+  }
+
+  const encryptpass = bcrypt.hashSync(password, 10);
+  const sql = 'INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)';
+  db.query(sql, [nombre, correo, usuario, encryptpass], (err, result) => {
+    if (err) {
+      console.error('Error al registrar', err);
+      return res.status(500).json({ message: 'Error al registrar el usuario' });
+    }
+    res.status(201).json({ message: 'Registro correcto', id: result.insertId });
+  });
+});
+
+// Crear entrenador (alias de registro, si quieres mantenerlo separado)
+app.post("/api/entrenadores", (req, res) => {
+  const { nombre, correo, usuario, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const sql = "INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)";
+  db.query(sql, [nombre, correo, usuario, hashedPassword], (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: "Error al crear entrenador" });
+    res.status(201).json({ success: true, message: "Entrenador creado", id: result.insertId });
+  });
+});
+
+// Leer todos los entrenadores
+app.get("/api/entrenadores", (req, res) => {
+  db.query("SELECT * FROM entrenador", (err, results) => {
+    if (err) return res.status(500).json({ success: false, message: "Error al obtener entrenadores" });
+    res.json(results);
+  });
+});
+
+// Leer un entrenador por id
+app.get("/api/entrenadores/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT * FROM entrenador WHERE id = ?", [id], (err, results) => {
+    if (err) return res.status(500).json({ success: false, message: "Error al obtener entrenador" });
+    res.json(results[0]);
+  });
+});
+
+// Actualizar entrenador
+app.put("/api/entrenadores/:id", (req, res) => {
+  const { id } = req.params;
+  const { nombre, correo, usuario, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const sql = "UPDATE entrenador SET Nombre_Entrenador = ?, Correo = ?, username = ?, password = ? WHERE id = ?";
+  db.query(sql, [nombre, correo, usuario, hashedPassword, id], (err) => {
+    if (err) return res.status(500).json({ success: false, message: "Error al actualizar entrenador" });
+    res.json({ success: true, message: "Entrenador actualizado" });
+  });
+});
+
+// Eliminar entrenador
+app.delete("/api/entrenadores/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("DELETE FROM entrenador WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json({ success: false, message: "Error al eliminar entrenador" });
+    res.json({ success: true, message: "Entrenador eliminado" });
+  });
+});
 app.listen(3000,()=>{
     console.log('el servidor esta corriendo en http://localhost:3000');
 });
