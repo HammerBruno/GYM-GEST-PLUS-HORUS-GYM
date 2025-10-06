@@ -181,12 +181,17 @@ app.post('/api/registro',(req,res)=>{
 
 // Crear entrenador (alias de registro, si quieres mantenerlo separado)
 app.post("/api/entrenadores", (req, res) => {
-  const { agregarnombre, agregarcorreo, agregarsuario, agregarpassword } = req.body;
-  const hashedPassword = bcrypt.hashSync(agregarpassword, 10);
+      const { agregarnombre, agregarcorreo, agregaruser, agregarpassword } = req.body;
+    if (!agregarpassword || !agregarnombre || !agregarcorreo || !agregaruser) {
+  return res.status(400).json({ success: false, message: "La contraseña es obligatoria" });
+}
+
+
+    const hashedPassword = bcrypt.hashSync(agregarpassword, 10);
   const sql = "INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)";
-  db.query(sql, [agregarnombre, agregarcorreo, agregarusuario, hashedPassword], (err, result) => {
+  db.query(sql, [agregarnombre, agregarcorreo, agregaruser, hashedPassword], (err, result) => {
     if (err) return res.status(500).json({ success: false, message: "Error al crear entrenador" });
-    res.status(201).json({ success: true, message: "Entrenador creado", id: result.insertId });
+    res.status(201).json({ success: true, message: "Entrenador creado", id_entrenador: result.insertId });
   });
 });
 
