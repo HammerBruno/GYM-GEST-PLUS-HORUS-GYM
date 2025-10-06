@@ -298,3 +298,14 @@ footer {
     font-size: 2em;
   }
 }
+
+
+.btn-per{
+  background-color: #1e1d1d;
+  color: red; /* Texto rojo */
+  border: 2px solid red;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: background 0.3s, color 0.3s;
+}
