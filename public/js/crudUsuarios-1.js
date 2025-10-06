@@ -9,7 +9,7 @@ function cargausuarios() {
         tabla.innerHTML += `
           <tr>
             <td>${u.nombre}</td>
-            <td>${u.apellido}</td>
+            <td>${u.usuario}</td>
             <td>${u.correo}</td>
             <td>${u.password}</td>
             <td>
@@ -43,9 +43,8 @@ function editarusuario(id) {
   fetch(`/api/usuarios/${id}`)
     .then(res => res.json())
     .then(usuario => {
-      document.getElementById("editarid").value = usuario.id;
-      document.getElementById("editarnombre").value = usuario.nombre;
-      document.getElementById("editarapellido").value = usuario.apellido;
+      document.getElementById("editarnombrecompleto").value = usuario.nombre;
+      document.getElementById("editaruser").value = usuario.user;
       document.getElementById("editarcorreo").value = usuario.correo;
       document.getElementById("editarpassword").value = '';
 

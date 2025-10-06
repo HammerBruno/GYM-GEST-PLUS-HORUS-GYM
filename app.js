@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
         user: 'horusgymserviceemail@gmail.com',
-        pass: 'tztu zmay kswc jdwt' // usar app password
+        pass: 'upyf cgwa vgaf khnh' // usar app password
     }
 });
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,8 +15,8 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Nombre</th>
-          <th>Apellido</th>
+          <th>Nombre Completo</th>
+          <th>Usuario</th>
           <th>Correo</th>
           <th>Password</th>
           <th>Acciones</th>
@@ -34,8 +34,8 @@
           <h5 class="modal-title">Agregar usuario</h5>
         </div>
         <div class="modal-body">
-          <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre" required>
-          <input type="text" name="apellido" class="form-control mb-2" placeholder="Apellido" required>
+          <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre Completo" required>
+          <input type="text" name="user" class="form-control mb-2" placeholder="Usuario" required>
           <input type="email" name="correo" class="form-control mb-2" placeholder="Correo" required>
           <input type="password" name="password" class="form-control mb-2" placeholder="Contraseña" required>
         </div>
@@ -55,9 +55,8 @@
           <h5 class="modal-title">Editar usuario</h5>
         </div>
         <div class="modal-body">
-          <input type="hidden" name="id" id="editarid">
-          <input type="text" name="nombre" id="editarnombre" class="form-control mb-2" placeholder="Nombre" required>
-          <input type="text" name="apellido" id="editarapellido" class="form-control mb-2" placeholder="Apellido" required>
+          <input type="text" name="nombre" id="editarnombrecompleto" class="form-control mb-2" placeholder="Nombre completo" required>
+          <input type="text" name="user" id="editaruser" class="form-control mb-2" placeholder="Usuario" required>
           <input type="email" name="correo" id="editarcorreo" class="form-control mb-2" placeholder="Correo" required>
           <input type="password" name="password" id="editarpassword" class="form-control mb-2" placeholder="Nueva contraseña (opcional)">
         </div>
