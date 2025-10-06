@@ -159,7 +159,7 @@ nav .logo span {
 /* Descripción del plan */
 .card p {
   font-size: 0.95em;
-  color: #ffffff;
+  color: #000000;
 }
 
 /* ------------------ BOTÓN INSCRIBIRSE ------------------ */
@@ -249,7 +249,7 @@ nav .logo span {
 /* Botón Enviar con fondo rojo */
 .formulario-oculto button[type="submit"] {
   background-color: rgb(245, 0, 0);
-  color: #fff;
+  color: #242222;
 }
 
 /* Botón Cancelar */

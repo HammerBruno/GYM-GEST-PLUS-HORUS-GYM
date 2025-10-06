@@ -1,0 +1,149 @@
+/* ===== RESET GENERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ===== FONDO ===== */
+body {
+  background: radial-gradient(circle at top, #400000, #000);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+section {
+  background: rgba(20, 20, 20, 0.95);
+  border-radius: 25px;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+  width: 600px;
+  min-height: 550px;
+  padding: 60px 50px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+/* ===== IMAGEN SUPERIOR CON HORUS ===== */
+section::before {
+  content: "HORUS";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85);
+  background: url("https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg?auto=compress&cs=tinysrgb&w=800") center/cover no-repeat;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100px;
+  width: 100%;
+  border-radius: 25px 25px 0 0;
+  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+}
+
+/* ===== TÍTULOS ===== */
+h2 {
+  font-size: 2em;
+  color: #fff;
+  margin-top: 85px;
+  margin-bottom: 10px;
+}
+
+h3 {
+  font-size: 0.95em;
+  color: #bbb;
+  margin-bottom: 40px;
+}
+
+/* ===== FORMULARIO ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ===== INPUT ESTILO PREMIUM ===== */
+#forgotemail {
+  max-width: 580px;          /* más largo que el botón */
+  min-height: 50px;
+  font-size: 1.05em;
+  padding: 18px 22px;
+  background-color: #2a2a2a;
+  border: 2px solid rgba(255,0,0,0.2);
+  border-radius: 25px;
+  color: #fff;
+  transition: all 0.4s ease;
+  box-shadow: inset 0 0 8px rgba(255,0,0,0.2);
+}
+
+#forgotemail:focus {
+  outline: none;
+  background-color: #3a3a3a;
+  border-color: #ff0000;
+  box-shadow: 0 0 20px rgba(255,0,0,0.7);
+}
+
+/* Separación entre input y botón */
+form .row.gy-3 > .col-12:first-child {
+  margin-bottom: 30px;
+}
+
+/* ===== BOTÓN PREMIUM ===== */
+button.btn-lg {
+  min-height: 55px;
+  font-size: 1.1em;
+  background: linear-gradient(135deg, #ff0000, #660000);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  width: 100%;
+  max-width: 500px;          /* más corto que el input */
+  padding: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+  transition: all 0.4s ease;
+}
+
+button.btn-lg:hover {
+  background: linear-gradient(135deg, #ff3333, #990000);
+  transform: scale(1.07);
+  box-shadow: 0 10px 25px rgba(255,0,0,0.6);
+}
+
+/* ===== ENLACE SECUNDARIO ===== */
+a.link-secondary {
+  display: inline-block;
+  margin-top: 35px;
+  color: #ff8080;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a.link-secondary:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ===== CENTRADO VERTICAL DEL CARD-BODY ===== */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.5s ease;
+}
