@@ -125,7 +125,7 @@ nav .logo span {
 
 /* Cada tarjeta individual */
 .card {
-  background-color: #2e2e2e;
+  background-color: #2e2e2e !important;
   border-radius: 15px;
   padding: 20px;
   width: 250px;
@@ -159,7 +159,7 @@ nav .logo span {
 /* Descripción del plan */
 .card p {
   font-size: 0.95em;
-  color: #000000;
+  color: #ffffff;
 }
 
 /* ------------------ BOTÓN INSCRIBIRSE ------------------ */
