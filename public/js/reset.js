@@ -1,4 +1,13 @@
-const token = window.location.pathname.split('/').pop();
+// Obtener el token desde la URL: ?token=xxxxx
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+
+if (!token) {
+  alert('Token no encontrado en la URL');
+  throw new Error('Token no encontrado');
+}
+
+console.log("🟢 Token leído desde URL:", token);
 
 document.getElementById('resetform').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -12,6 +21,7 @@ document.getElementById('resetform').addEventListener('submit', async (e) => {
   }
 
   try {
+    // 🔹 Aquí enviamos el token como parte de la URL
     const res = await fetch(`/api/reset/${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -19,12 +29,16 @@ document.getElementById('resetform').addEventListener('submit', async (e) => {
     });
 
     const data = await res.json();
-    alert(data.message);
+    console.log("Respuesta del servidor:", data);
 
     if (data.success) {
+      alert('Contraseña actualizada correctamente.');
       window.location.href = '/login.html';
+    } else {
+      alert(data.message || 'Error al restablecer la contraseña.');
     }
   } catch (err) {
-    alert('Error al conectar al servidor');
+    console.error('Error:', err);
+    alert('Error al conectar con el servidor.');
   }
 });

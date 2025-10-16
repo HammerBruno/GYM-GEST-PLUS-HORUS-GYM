@@ -25,166 +25,123 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-/* Recuperar contraseña */
+// ======================================================
+// Solicitud de recuperación de contraseña
+// ======================================================
 app.post('/api/forgot', async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    if (!email) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'El campo email es obligatorio' 
-        });
-    }
-
-    const sql = 'SELECT * FROM entrenador WHERE Correo = ?';
-    db.query(sql, [email], async (err, result) => {
-        if (err) {
-            console.error('Error en la consulta SQL', err);
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Error interno en la base de datos' 
-            });
-        }
-
-        if (result.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'El correo no está registrado' 
-            });
-        }
-
-        // Generar token y guardar
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiration = new Date(Date.now() + 3600000).toISOString().slice(0, 19).replace('T', ' '); // 1 hora
-        const updateSql = 'UPDATE entrenador SET reset_token = ?, token_expiry = ? WHERE Correo = ?';
-
-        db.query(updateSql, [token, expiration, email], (err) => {
-            if (err) {
-                console.error('Error al guardar el token', err);
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'No se pudo generar el enlace de recuperación' 
-                });
-            }
-
-            // Configurar correo
-            const mailOptions = {
-                from: 'horusgymserviceemail@gmail.com',
-                to: email,
-                subject: 'Recuperación de contraseña',
-                html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-                       <a href="http://localhost:3000/reset.html?token=${token}">Restablecer contraseña</a>`
-            };
-
-            transporter.sendMail(mailOptions, (err, info) => {
-                if (err) {
-                    console.error('Error al enviar el correo', err);
-                    return res.status(500).json({ 
-                        success: false, 
-                        message: 'No se pudo enviar el correo de recuperación' 
-                    });
-                }
-
-                // ✅ Mensaje de éxito final
-                return res.status(200).json({ 
-                    success: true, 
-                    message: 'Se ha enviado un correo con instrucciones para restablecer tu contraseña' 
-                });
-            });
-        });
-    });
-});
-
-//api reset
-
-
-
-app.post('/api/reset/:token', (req, res) => {
-  const { token } = req.params;
-  const { nuevapassword, confirmpassword } = req.body;
-
-  // 👇 AGREGAR ESTOS LOGS PARA DEBUG
-  console.log('🔐 TOKEN recibido:', token);
-  console.log('📧 DATOS recibidos del body:', req.body);
-  console.log('🔑 Nueva contraseña:', nuevapassword);
-  console.log('✅ Confirmar contraseña:', confirmpassword);
-
-  if (!nuevapassword || !confirmpassword) {
-    console.log('❌ Error: Faltan contraseñas');
-    return res.status(400).json({
-      success: false,
-      message: 'Ambas contraseñas son requeridas'
-    });
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'El campo email es obligatorio' });
   }
 
-  if (nuevapassword !== confirmpassword) {
-    return res.status(400).json({
-      success: false,
-      message: 'Las contraseñas deben ser iguales'
-    });
-  }
-
-  // Obtener la fecha actual en formato MySQL para comparar
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-  // Cambiar 'usuarios' por 'entrenador' y usar formato correcto de fecha
-  const sql = 'SELECT * FROM entrenador WHERE reset_token = ? AND token_expiry > ?';
-  
-  db.query(sql, [token, now], (err, results) => {
+  const sql = 'SELECT * FROM entrenador WHERE Correo = ?';
+  db.query(sql, [email], async (err, result) => {
     if (err) {
-      console.error('Error en la consulta de token', err);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Error interno del servidor' 
-      });
+      console.error('❌ Error en la consulta SQL', err);
+      return res.status(500).json({ success: false, message: 'Error interno en la base de datos' });
     }
 
-    if (results.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Token inválido o expirado' 
-      });
+    if (result.length === 0) {
+      return res.status(404).json({ success: false, message: 'El correo no está registrado' });
     }
 
-    bcrypt.hash(nuevapassword, 10, (err, hash) => {
+    // Generar token y guardar con fecha de expiración
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiration = new Date(Date.now() + 3600000); // +1 hora
+    const mysqlDate = expiration.toISOString().slice(0, 19).replace('T', ' ');
+
+    const updateSql = 'UPDATE entrenador SET reset_token = ?, token_expiry = ? WHERE Correo = ?';
+    db.query(updateSql, [token, mysqlDate, email], (err) => {
       if (err) {
-        console.error('Error al encriptar la contraseña', err);
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Error al encriptar la contraseña' 
-        });
+        console.error('❌ Error al guardar el token', err);
+        return res.status(500).json({ success: false, message: 'No se pudo generar el enlace de recuperación' });
       }
 
-      // Actualizar en la tabla correcta (entrenador)
-      const updateSql = 'UPDATE entrenador SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?';
-      
-      db.query(updateSql, [hash, token], (err, result) => {
+      const resetLink = `http://localhost:3000/reset.html?token=${token}`;
+
+      const mailOptions = {
+        from: 'horusgymserviceemail@gmail.com',
+        to: email,
+        subject: 'Recuperación de contraseña',
+        html: `
+          <h2>Recuperación de contraseña</h2>
+          <p>Haz clic en el siguiente enlace para restablecer tu contraseña (válido por 1 hora):</p>
+          <a href="${resetLink}">${resetLink}</a>
+          <p>Si no solicitaste este cambio, ignora este mensaje.</p>
+        `
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-          console.error('Error al actualizar la contraseña', err);
-          return res.status(500).json({ 
-            success: false, 
-            message: 'Error al actualizar la contraseña' 
-          });
+          console.error('❌ Error al enviar el correo', err);
+          return res.status(500).json({ success: false, message: 'No se pudo enviar el correo de recuperación' });
         }
 
-        if (result.affectedRows === 0) {
-          return res.status(400).json({ 
-            success: false, 
-            message: 'No se pudo actualizar la contraseña' 
-          });
-        }
-
-        res.status(200).json({ 
-          success: true, 
-          message: 'Contraseña actualizada correctamente' 
-        });
+        console.log(`✅ Correo enviado a ${email} con token: ${token}`);
+        res.status(200).json({ success: true, message: 'Correo de recuperación enviado correctamente' });
       });
     });
   });
 });
 
+// ======================================================
+// Restablecer contraseña con token
+// ======================================================
+app.post('/api/reset/:token', (req, res) => {
+  const { token } = req.params;
+  const { nuevapassword, confirmpassword } = req.body;
 
+  console.log('🔐 Token recibido:', token);
+  console.log('📦 Body recibido:', req.body);
 
+  if (!nuevapassword || !confirmpassword) {
+    return res.status(400).json({ success: false, message: 'Ambas contraseñas son requeridas' });
+  }
+
+  if (nuevapassword !== confirmpassword) {
+    return res.status(400).json({ success: false, message: 'Las contraseñas deben ser iguales' });
+  }
+
+  const sql = 'SELECT * FROM entrenador WHERE reset_token = ? AND token_expiry > NOW()';
+  db.query(sql, [token], (err, results) => {
+    if (err) {
+      console.error('❌ Error en la consulta de token', err);
+      return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    }
+
+    if (results.length === 0) {
+      console.log('⚠️ Token inválido o expirado');
+      return res.status(400).json({ success: false, message: 'Token inválido o expirado' });
+    }
+
+    bcrypt.hash(nuevapassword, 10, (err, hash) => {
+      if (err) {
+        console.error('❌ Error al encriptar la contraseña', err);
+        return res.status(500).json({ success: false, message: 'Error al encriptar la contraseña' });
+      }
+
+      const updateSql = `
+        UPDATE entrenador 
+        SET password = ?, reset_token = NULL, token_expiry = NULL 
+        WHERE reset_token = ?
+      `;
+      db.query(updateSql, [hash, token], (err, result) => {
+        if (err) {
+          console.error('❌ Error al actualizar la contraseña', err);
+          return res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
+        }
+
+        if (result.affectedRows === 0) {
+          return res.status(400).json({ success: false, message: 'No se pudo actualizar la contraseña' });
+        }
+
+        console.log('✅ Contraseña actualizada correctamente para el token:', token);
+        res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente' });
+      });
+    });
+  });
+});
     
 
 
