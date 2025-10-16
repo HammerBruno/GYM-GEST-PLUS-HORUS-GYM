@@ -99,26 +99,18 @@ app.post('/api/forgot', async (req, res) => {
 
 
 
-const path = require('path');
-const bcrypt = require('bcrypt');
-const db = require('./db'); // Ajusta según tu conexión a la base de datos
-
-app.get('/reset/:token', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'reset.html'));
-});
-
 app.post('/api/reset/:token', (req, res) => {
   const { token } = req.params;
-  const { nuevapassword, confirpassword } = req.body;
+  const { nuevapassword, confirmpassword } = req.body;
 
-  if (!nuevapassword || !confirpassword) {
+  if (!nuevapassword || !confirmpassword) {
     return res.status(400).json({
       success: false,
       message: 'Ambas contraseñas son requeridas'
     });
   }
 
-  if (nuevapassword !== confirpassword) {
+  if (nuevapassword !== confirmpassword) {
     return res.status(400).json({
       success: false,
       message: 'Las contraseñas deben ser iguales'
@@ -128,47 +120,29 @@ app.post('/api/reset/:token', (req, res) => {
   const sql = 'SELECT * FROM usuarios WHERE reset_token = ? AND token_expiry > ?';
   db.query(sql, [token, Date.now()], (err, results) => {
     if (err) {
-      return res.status(500).json({
-        success: false,
-        message: 'Error interno'
-      });
+      return res.status(500).json({ success: false, message: 'Error interno' });
     }
 
     if (results.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token inválido o expirado'
-      });
+      return res.status(400).json({ success: false, message: 'Token inválido o expirado' });
     }
 
     bcrypt.hash(nuevapassword, 10, (err, hash) => {
       if (err) {
-        return res.status(500).json({
-          success: false,
-          message: 'Error al encriptar la contraseña'
-        });
+        return res.status(500).json({ success: false, message: 'Error al encriptar la contraseña' });
       }
 
       const updateSql = 'UPDATE usuarios SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?';
       db.query(updateSql, [hash, token], (err) => {
         if (err) {
-          return res.status(500).json({
-            success: false,
-            message: 'Error al actualizar la contraseña'
-          });
+          return res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
         }
 
-        res.status(200).json({
-          success: true,
-          message: 'Contraseña actualizada correctamente'
-        });
+        res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente' });
       });
     });
   });
 });
-
-
-
 
 
 
