@@ -103,7 +103,14 @@ app.post('/api/reset/:token', (req, res) => {
   const { token } = req.params;
   const { nuevapassword, confirmpassword } = req.body;
 
+  // 👇 AGREGAR ESTOS LOGS PARA DEBUG
+  console.log('🔐 TOKEN recibido:', token);
+  console.log('📧 DATOS recibidos del body:', req.body);
+  console.log('🔑 Nueva contraseña:', nuevapassword);
+  console.log('✅ Confirmar contraseña:', confirmpassword);
+
   if (!nuevapassword || !confirmpassword) {
+    console.log('❌ Error: Faltan contraseñas');
     return res.status(400).json({
       success: false,
       message: 'Ambas contraseñas son requeridas'
@@ -117,33 +124,64 @@ app.post('/api/reset/:token', (req, res) => {
     });
   }
 
-  const sql = 'SELECT * FROM usuarios WHERE reset_token = ? AND token_expiry > ?';
-  db.query(sql, [token, Date.now()], (err, results) => {
+  // Obtener la fecha actual en formato MySQL para comparar
+  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  // Cambiar 'usuarios' por 'entrenador' y usar formato correcto de fecha
+  const sql = 'SELECT * FROM entrenador WHERE reset_token = ? AND token_expiry > ?';
+  
+  db.query(sql, [token, now], (err, results) => {
     if (err) {
-      return res.status(500).json({ success: false, message: 'Error interno' });
+      console.error('Error en la consulta de token', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error interno del servidor' 
+      });
     }
 
     if (results.length === 0) {
-      return res.status(400).json({ success: false, message: 'Token inválido o expirado' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Token inválido o expirado' 
+      });
     }
 
     bcrypt.hash(nuevapassword, 10, (err, hash) => {
       if (err) {
-        return res.status(500).json({ success: false, message: 'Error al encriptar la contraseña' });
+        console.error('Error al encriptar la contraseña', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Error al encriptar la contraseña' 
+        });
       }
 
-      const updateSql = 'UPDATE usuarios SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?';
-      db.query(updateSql, [hash, token], (err) => {
+      // Actualizar en la tabla correcta (entrenador)
+      const updateSql = 'UPDATE entrenador SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?';
+      
+      db.query(updateSql, [hash, token], (err, result) => {
         if (err) {
-          return res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
+          console.error('Error al actualizar la contraseña', err);
+          return res.status(500).json({ 
+            success: false, 
+            message: 'Error al actualizar la contraseña' 
+          });
         }
 
-        res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente' });
+        if (result.affectedRows === 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: 'No se pudo actualizar la contraseña' 
+          });
+        }
+
+        res.status(200).json({ 
+          success: true, 
+          message: 'Contraseña actualizada correctamente' 
+        });
       });
     });
   });
 });
-
 
 
 
