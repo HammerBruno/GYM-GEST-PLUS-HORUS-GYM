@@ -8,6 +8,7 @@ const bcrypt = require ('bcrypt');
 const app = express();
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 
 app.use(cors());
@@ -142,14 +143,140 @@ app.post('/api/reset/:token', (req, res) => {
     });
   });
 });
+
+//formularios del index
+// Limitar peticiones para evitar abuso
+const limiter = rateLimit({ windowMs: 60_000, max: 30 });
+app.use(limiter);
+
+// Configuracion MySQL desde .env
+// .env debe tener: DB_HOST, DB_USER, DB_PASS, DB_NAME, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_TO
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASS || '',
+  database: process.env.DB_NAME || 'gymdb',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+};
+
+// Transportador nodemailer (SMTP)
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: Number(process.env.SMTP_PORT) === 465,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+
+// Mapeo permitido de tablas (evita inyección por table name)
+const ALLOWED_TABLES = new Set(['clientebasico','clienteacom','clientesemi','clienteperso']);
+
+app.post('/api/signup', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const table = String(body.table || '').trim();
+
+    if (!ALLOWED_TABLES.has(table)) {
+      return res.status(400).json({ ok: false, error: 'invalid_table' });
+    }
+
+    // Campos esperados
+    const name = String(body.name || '').slice(0, 100).trim();
+    const email = String(body.email || '').slice(0, 255).trim();
+    const edad = body.edad ? parseInt(body.edad, 10) : null;
+    const sexo = String(body.sexo || '').slice(0, 20).trim();
+    const condicionesmedicas = String(body.condicionesmedicas || '').trim();
+    const trainingob = String(body.trainingob || '').trim();
+    const planName = String(body.planName || '').trim();
+
+    if (!name || !email) return res.status(400).json({ ok: false, error: 'missing_fields' });
+
+    // Conexión a BD y consulta preparada
+    const pool = mysql.createPool(dbConfig);
+    let sql, params;
+
+    // Construir INSERT según la tabla, respetando los campos que definiste
+    if (table === 'clientebasico') {
+      sql = `INSERT INTO clientebasico (name, email, edad, condicionesmedicas, trainingob, created_at) VALUES (?, ?, ?, ?, ?, NOW())`;
+      params = [name, email, edad, condicionesmedicas, trainingob];
+    } else if (table === 'clienteacom' || table === 'clientesemi') {
+      // columnas: name,email,edad,condicionesmedicas,trainingob,antropometrics,trainingplan,assignedcoach,created_at
+      // Si no vienen los campos adicionales los dejamos vacíos
+      const antropometrics = body.antropometrics ? String(body.antropometrics).trim() : '';
+      const trainingplan = body.trainingplan ? String(body.trainingplan).trim() : '';
+      const assignedcoach = body.assignedcoach ? String(body.assignedcoach).slice(0,50).trim() : '';
+      sql = `INSERT INTO ${table} (name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+      params = [name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach];
+    } else if (table === 'clienteperso') {
+      // columnas: name,email,edad,condicionesmedicas,trainingob,antropometrics,trainingplan,assignedcoach,eatplan,drugplan,created_at
+      const antropometrics = body.antropometrics ? String(body.antropometrics).trim() : '';
+      const trainingplan = body.trainingplan ? String(body.trainingplan).trim() : '';
+      const assignedcoach = body.assignedcoach ? String(body.assignedcoach).slice(0,50).trim() : '';
+      const eatplan = body.eatplan ? String(body.eatplan).trim() : '';
+      const drugplan = body.drugplan ? String(body.drugplan).trim() : '';
+      sql = `INSERT INTO clienteperso (name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, eatplan, drugplan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+      params = [name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, eatplan, drugplan];
+    } else {
+      return res.status(400).json({ ok: false, error: 'unsupported_table' });
+    }
+
+    const conn = await pool.getConnection();
+    try {
+      const [result] = await conn.execute(sql, params);
+      const insertId = result.insertId || null;
+
+      // Enviar correo con los datos de inscripción
+      const mailTo = process.env.MAIL_TO || process.env.SMTP_USER;
+      const subject = `Nueva inscripción - ${planName} - ${name}`;
+      const bodyText = [
+        `Nombre: ${name}`,
+        `Email: ${email}`,
+        `Edad: ${edad ?? ''}`,
+        `Sexo: ${sexo}`,
+        `Plan: ${planName}`,
+        `Condiciones médicas: ${condicionesmedicas}`,
+        `Objetivos: ${trainingob}`,
+        `Registro ID: ${insertId ?? ''}`
+      ].join('\n');
+
+      await transporter.sendMail({
+        from: `"Horus" <${process.env.SMTP_USER}>`,
+        to: mailTo,
+        subject,
+        text: bodyText
+      });
+
+      res.json({ ok: true, id: insertId });
+    } finally {
+      conn.release();
+      await pool.end();
+    }
+
+  } catch (err) {
+    console.error('signup error', err);
+    res.status(500).json({ ok: false, error: 'server_error' });
+  }
+});
+
+// Servir archivos estáticos (tu HTML y script)
+app.use('/', express.static('public'));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+
+
+
+
     
 
 
 
 
-app.get('/api/saludo', (req, res)=>{
-    res.json({ mensaje: 'hola'})
-});
+
 
 // login api//
 app.post('/api/login', async (req, res) => {
