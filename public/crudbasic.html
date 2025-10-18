@@ -1,53 +1,130 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes basicos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes Básicos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="assets/style1.css">
 </head>
-
 <body>
-<div class="container">
-  <h2>Clientes basicos</h2>
-  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Agregar cliente basico</button>
-  <p>The .table-hover class enables a hover state on table rows:</p>            
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>id</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Email</th>
-        <th>Edad</th>
-        <th>Sexo</th>
-        <th>Condiciones Medicas</th>
-        <th>Objetivos de entrenamiento</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <div class="container mt-4">
+    <h2>Clientes Básicos</h2>
+    <button class="btn btn-per mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregarBasico">Agregar Cliente Básico</button>
 
+    <table class="table table-dark table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Edad</th>
+          <th>Sexo</th>
+          <th>Condiciones Médicas</th>
+          <th>Objetivos de Entrenamiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientesBasicos"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal agregar cliente básico -->
+  <div class="modal fade" id="modalAgregarBasico" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form id="formAgregarBasico" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar Cliente Básico</h5>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" name="nombreBasico" class="form-control mb-2" placeholder="Nombre" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" name="emailBasico" class="form-control mb-2" placeholder="Email" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <input type="number" name="edadBasico" class="form-control mb-2" placeholder="Edad">
+            </div>
+            <div class="col-md-4">
+              <select name="sexoBasico" class="form-control mb-2" required>
+                <option value="">Seleccionar sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="condicionesBasico" class="form-control mb-2" placeholder="Condiciones Médicas" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="objetivosBasico" class="form-control mb-2" placeholder="Objetivos de Entrenamiento" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal editar cliente básico -->
+  <div class="modal fade" id="modalEditarBasico" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form id="formEditarBasico" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Cliente Básico</h5>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="idBasico">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" name="editNombreBasico" class="form-control mb-2" placeholder="Nombre" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" name="editEmailBasico" class="form-control mb-2" placeholder="Email" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <input type="number" name="editEdadBasico" class="form-control mb-2" placeholder="Edad">
+            </div>
+            <div class="col-md-4">
+              <select name="editSexoBasico" class="form-control mb-2" required>
+                <option value="">Seleccionar sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editCondicionesBasico" class="form-control mb-2" placeholder="Condiciones Médicas" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editObjetivosBasico" class="form-control mb-2" placeholder="Objetivos de Entrenamiento" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button type="submit" class="btn btn-success">Actualizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/crudbasic.js"></script>
 </body>
-
 </html>

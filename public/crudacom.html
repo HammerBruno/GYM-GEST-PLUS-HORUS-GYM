@@ -1,56 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes basicos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes Acompañamiento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="assets/style1.css">
 </head>
-
 <body>
-<div class="container">
-  <h2>Clientes basicos</h2>
-  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Agregar cliente basico</button>
-  <p>The .table-hover class enables a hover state on table rows:</p>            
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>id</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Email</th>
-        <th>Edad</th>
-        <th>Sexo</th>
-        <th>Condiciones Medicas</th>
-        <th>Objetivos de entrenamiento</th>
-        <th>Ficha antropometrica</th>
-        <th>Plan de entrenamiento</th>
-        <th>Entrenador asignado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <div class="container mt-4">
+    <h2>Clientes Acompañamiento</h2>
+    <button class="btn btn-per mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregarAcom">Agregar Cliente Acompañamiento</button>
 
+    <table class="table table-dark table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Edad</th>
+          <th>Sexo</th>
+          <th>Condiciones Médicas</th>
+          <th>Objetivos de Entrenamiento</th>
+          <th>Ficha Antropométrica</th>
+          <th>Plan de Entrenamiento</th>
+          <th>Entrenador Asignado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientesAcom"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal agregar cliente acompañamiento -->
+  <div class="modal fade" id="modalAgregarAcom" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form id="formAgregarAcom" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar Cliente Acompañamiento</h5>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" name="nombreAcom" class="form-control mb-2" placeholder="Nombre" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" name="emailAcom" class="form-control mb-2" placeholder="Email" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <input type="number" name="edadAcom" class="form-control mb-2" placeholder="Edad">
+            </div>
+            <div class="col-md-4">
+              <select name="sexoAcom" class="form-control mb-2" required>
+                <option value="">Seleccionar sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="condicionesAcom" class="form-control mb-2" placeholder="Condiciones Médicas" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="objetivosAcom" class="form-control mb-2" placeholder="Objetivos de Entrenamiento" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="fichaAcom" class="form-control mb-2" placeholder="Ficha Antropométrica" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="planEntrenamientoAcom" class="form-control mb-2" placeholder="Plan de Entrenamiento" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <input type="text" name="entrenadorAcom" class="form-control mb-2" placeholder="Entrenador Asignado">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal editar cliente acompañamiento -->
+  <div class="modal fade" id="modalEditarAcom" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form id="formEditarAcom" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Cliente Acompañamiento</h5>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="idAcom">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" name="editNombreAcom" class="form-control mb-2" placeholder="Nombre" required>
+            </div>
+            <div class="col-md-6">
+              <input type="email" name="editEmailAcom" class="form-control mb-2" placeholder="Email" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <input type="number" name="editEdadAcom" class="form-control mb-2" placeholder="Edad">
+            </div>
+            <div class="col-md-4">
+              <select name="editSexoAcom" class="form-control mb-2" required>
+                <option value="">Seleccionar sexo</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editCondicionesAcom" class="form-control mb-2" placeholder="Condiciones Médicas" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editObjetivosAcom" class="form-control mb-2" placeholder="Objetivos de Entrenamiento" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editFichaAcom" class="form-control mb-2" placeholder="Ficha Antropométrica" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <textarea name="editPlanEntrenamientoAcom" class="form-control mb-2" placeholder="Plan de Entrenamiento" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <input type="text" name="editEntrenadorAcom" class="form-control mb-2" placeholder="Entrenador Asignado">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button type="submit" class="btn btn-success">Actualizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/crudacom.js"></script>
 </body>
-
 </html>
