@@ -1,37 +1,188 @@
-/*el backend*/
 require('dotenv').config();
-const express = require ('express');
-const cors = require ('cors');
-const path = require ('path');
-const db = require ('./db');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const db = require('./db');
 const { message } = require('statuses');
-const bcrypt = require ('bcrypt');
+const bcrypt = require('bcrypt');
 const app = express();
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 
+// ✅ AGREGAR ESTA LÍNEA - FALTABA
+const mysql = require('mysql2/promise');
 
 app.use(cors());
-
 app.use(express.json());
+app.use(express.static('public'));
 
-app.use(express.static(path.join(__dirname,'public')));
 /*correo*/
-
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false,
     auth: {
-        user: 'horusgymserviceemail@gmail.com',
-        pass: 'upyf cgwa vgaf khnh' // usar app password
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
     }
 });
 
 // ======================================================
-// Solicitud de recuperación de contraseña
+// CONFIGURACIÓN FORMULARIO INSCRIPCIÓN (NUEVO)
 // ======================================================
+
+// Configuración MySQL desde .env
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || '',
+    database: process.env.DB_NAME || 'gymgestplus',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
+
+// Crear pool de conexiones
+const pool = mysql.createPool(dbConfig);
+
+// Función para mapear plan a tabla
+function mapPlanToTable(plan) {
+    const planLower = plan.toLowerCase();
+    if (planLower.includes('básico') || planLower.includes('basico')) return 'clientebasico';
+    if (planLower.includes('acompañamiento') || planLower.includes('acompanamiento')) return 'clienteacom';
+    if (planLower.includes('semi')) return 'clientesemi';
+    if (planLower.includes('personalizado')) return 'clienteperso';
+    return 'clientebasico'; // default
+}
+
+// Ruta para procesar inscripciones
+app.post('/api/inscripcion', async (req, res) => {
+    let connection;
+    try {
+        const { plan, nombre, email, edad, sexo, salud, objetivos } = req.body;
+
+        // Validaciones básicas
+        if (!nombre || !email || !plan || !sexo) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Faltan campos requeridos: nombre, email, plan y sexo' 
+            });
+        }
+
+        // Determinar la tabla según el plan
+        const tabla = mapPlanToTable(plan);
+        
+        // Conectar a la base de datos
+        connection = await pool.getConnection();
+
+        // Insertar en la tabla correspondiente
+        let query, params;
+
+        switch(tabla) {
+            case 'clientebasico':
+                query = `INSERT INTO clientebasico (name, email, edad, sexo, condicionesmedicas, trainingob, created_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+                params = [nombre, email, edad, sexo, salud, objetivos];
+                break;
+
+            case 'clienteacom':
+                query = `INSERT INTO clienteacom (name, email, edad, sexo, condicionesmedicas, trainingob, created_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+                params = [nombre, email, edad, sexo, salud, objetivos];
+                break;
+
+            case 'clientesemi':
+                query = `INSERT INTO clientesemi (name, email, edad, sexo, condicionesmedicas, trainingob, created_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+                params = [nombre, email, edad, sexo, salud, objetivos];
+                break;
+
+            case 'clienteperso':
+                query = `INSERT INTO clienteperso (name, email, edad, sexo, condicionesmedicas, trainingob, created_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+                params = [nombre, email, edad, sexo, salud, objetivos];
+                break;
+
+            default:
+                throw new Error('Tabla no válida');
+        }
+
+        // Ejecutar la inserción
+        const [result] = await connection.execute(query, params);
+        const idInscripcion = result.insertId;
+
+        // Enviar correo electrónico
+        try {
+            const mailOptions = {
+                from: `"Horus Gym" <${process.env.SMTP_USER}>`,
+                to: process.env.MAIL_TO || process.env.SMTP_USER,
+                subject: `Nueva Inscripción - Plan ${plan}`,
+                html: `
+                    <h2>Nueva Inscripción Recibida</h2>
+                    <p><strong>Plan:</strong> ${plan}</p>
+                    <p><strong>Nombre:</strong> ${nombre}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Edad:</strong> ${edad}</p>
+                    <p><strong>Sexo:</strong> ${sexo}</p>
+                    <p><strong>Condiciones médicas:</strong> ${salud || 'Ninguna'}</p>
+                    <p><strong>Objetivos:</strong> ${objetivos || 'No especificado'}</p>
+                    <p><strong>ID de inscripción:</strong> ${idInscripcion}</p>
+                    <p><strong>Fecha:</strong> ${new Date().toLocaleString()}</p>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log('Correo enviado correctamente');
+
+        } catch (emailError) {
+            console.error('Error enviando correo:', emailError);
+            // No fallamos la petición si solo falla el correo
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Inscripción registrada correctamente',
+            id: idInscripcion 
+        });
+
+    } catch (error) {
+        console.error('Error en /api/inscripcion:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error interno del servidor: ' + error.message 
+        });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+// Ruta de prueba para verificar que el servidor funciona
+app.get('/api/test', async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        await connection.execute('SELECT 1');
+        connection.release();
+        
+        res.json({ 
+            success: true, 
+            message: 'Servidor y base de datos funcionando correctamente' 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error conectando a la base de datos: ' + error.message 
+        });
+    }
+});
+
+// ======================================================
+// RUTAS EXISTENTES (TUS RUTAS ORIGINALES)
+// ======================================================
+
+// Solicitud de recuperación de contraseña
 app.post('/api/forgot', async (req, res) => {
   const { email } = req.body;
 
@@ -89,9 +240,7 @@ app.post('/api/forgot', async (req, res) => {
   });
 });
 
-// ======================================================
 // Restablecer contraseña con token
-// ======================================================
 app.post('/api/reset/:token', (req, res) => {
   const { token } = req.params;
   const { nuevapassword, confirmpassword } = req.body;
@@ -147,132 +296,7 @@ app.post('/api/reset/:token', (req, res) => {
   });
 });
 
-//formularios del index
-// Limitar peticiones para evitar abuso
-const limiter = rateLimit({ windowMs: 60_000, max: 30 });
-app.use(limiter);
-
-// Configuracion MySQL desde .env
-// .env debe tener: DB_HOST, DB_USER, DB_PASS, DB_NAME, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_TO
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'gymgestplus',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-};
-
-
-
-// Mapeo permitido de tablas (evita inyección por table name)
-const ALLOWED_TABLES = new Set(['clientebasico','clienteacom','clientesemi','clienteperso']);
-
-app.post('/api/signup', async (req, res) => {
-  try {
-    const body = req.body || {};
-    const table = String(body.table || '').trim();
-
-    if (!ALLOWED_TABLES.has(table)) {
-      return res.status(400).json({ ok: false, error: 'invalid_table' });
-    }
-
-    // Campos esperados
-    const name = String(body.name || '').slice(0, 100).trim();
-    const email = String(body.email || '').slice(0, 255).trim();
-    const edad = body.edad ? parseInt(body.edad, 10) : null;
-    const sexo = String(body.sexo || '').slice(0, 20).trim();
-    const condicionesmedicas = String(body.condicionesmedicas || '').trim();
-    const trainingob = String(body.trainingob || '').trim();
-    const planName = String(body.planName || '').trim();
-
-    if (!name || !email) return res.status(400).json({ ok: false, error: 'missing_fields' });
-
-    // Conexión a BD y consulta preparada
-    const pool = mysql.createPool(dbConfig);
-    let sql, params;
-
-    // Construir INSERT según la tabla, respetando los campos que definiste
-    if (table === 'clientebasico') {
-      sql = `INSERT INTO clientebasico (name, email, edad, condicionesmedicas, trainingob, created_at) VALUES (?, ?, ?, ?, ?, NOW())`;
-      params = [name, email, edad, condicionesmedicas, trainingob];
-    } else if (table === 'clienteacom' || table === 'clientesemi') {
-      // columnas: name,email,edad,condicionesmedicas,trainingob,antropometrics,trainingplan,assignedcoach,created_at
-      // Si no vienen los campos adicionales los dejamos vacíos
-      const antropometrics = body.antropometrics ? String(body.antropometrics).trim() : '';
-      const trainingplan = body.trainingplan ? String(body.trainingplan).trim() : '';
-      const assignedcoach = body.assignedcoach ? String(body.assignedcoach).slice(0,50).trim() : '';
-      sql = `INSERT INTO ${table} (name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
-      params = [name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach];
-    } else if (table === 'clienteperso') {
-      // columnas: name,email,edad,condicionesmedicas,trainingob,antropometrics,trainingplan,assignedcoach,eatplan,drugplan,created_at
-      const antropometrics = body.antropometrics ? String(body.antropometrics).trim() : '';
-      const trainingplan = body.trainingplan ? String(body.trainingplan).trim() : '';
-      const assignedcoach = body.assignedcoach ? String(body.assignedcoach).slice(0,50).trim() : '';
-      const eatplan = body.eatplan ? String(body.eatplan).trim() : '';
-      const drugplan = body.drugplan ? String(body.drugplan).trim() : '';
-      sql = `INSERT INTO clienteperso (name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, eatplan, drugplan, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
-      params = [name, email, edad, condicionesmedicas, trainingob, antropometrics, trainingplan, assignedcoach, eatplan, drugplan];
-    } else {
-      return res.status(400).json({ ok: false, error: 'unsupported_table' });
-    }
-
-    const conn = await pool.getConnection();
-    try {
-      const [result] = await conn.execute(sql, params);
-      const insertId = result.insertId || null;
-
-      // Enviar correo con los datos de inscripción
-      const mailTo = process.env.MAIL_TO || process.env.SMTP_USER;
-      const subject = `Nueva inscripción - ${planName} - ${name}`;
-      const bodyText = [
-        `Nombre: ${name}`,
-        `Email: ${email}`,
-        `Edad: ${edad ?? ''}`,
-        `Sexo: ${sexo}`,
-        `Plan: ${planName}`,
-        `Condiciones médicas: ${condicionesmedicas}`,
-        `Objetivos: ${trainingob}`,
-        `Registro ID: ${insertId ?? ''}`
-      ].join('\n');
-
-      await transporter.sendMail({
-        from: `"Horus" <${process.env.SMTP_USER}>`,
-        to: mailTo,
-        subject,
-        text: bodyText
-      });
-
-      res.json({ ok: true, id: insertId });
-    } finally {
-      conn.release();
-      await pool.end();
-    }
-
-  } catch (err) {
-    console.error('signup error', err);
-    res.status(500).json({ ok: false, error: 'server_error' });
-  }
-});
-
-// Servir archivos estáticos (tu HTML y script)
-app.use('/', express.static('public'));
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
-
-
-
-
-    
-
-
-
-
-
-
-// login api//
+// login api
 app.post('/api/login', async (req, res) => {
     const {usuario, password} = req.body;
     if (!usuario || !password) {
@@ -300,9 +324,8 @@ app.post('/api/login', async (req, res) => {
             user: {id: user.id_entrenador, nombre: user.Nombre_Entrenador}, message: 'Inicio correcto' });
     });
 });
-    
-// registro api//
 
+// registro api
 app.post('/api/registro',(req,res)=>{
     const {nombre,correo,usuario,password}=req.body;
     if(!nombre||!correo||!usuario||!password){
@@ -319,40 +342,18 @@ app.post('/api/registro',(req,res)=>{
             message:'Error al registrar el usuario'
         });
         }
-        //console.log('registro correcto');
         res.status(201).json({
             message:'registro correcto'
         });
     });
 });
 
-// crud
-/*app.post('/api/crud', (req, res) => {
-  const { nombre, correo, usuario, password } = req.body;
-  if (!nombre || !correo || !usuario || !password) {
-    return res.status(400).json({
-      message: 'Todos los campos son obligatorios'
-    });
-  }
-
-  const encryptpass = bcrypt.hashSync(password, 10);
-  const sql = 'INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)';
-  db.query(sql, [nombre, correo, usuario, encryptpass], (err, result) => {
-    if (err) {
-      console.error('Error al registrar', err);
-      return res.status(500).json({ message: 'Error al registrar el usuario' });
-    }
-    res.status(201).json({ message: 'Registro correcto', id: result.insertId });
-  });
-});*/
-
-// Crear entrenador (alias de registro, si quieres mantenerlo separado)
+// Crear entrenador
 app.post("/api/entrenadores", (req, res) => {
       const { agregarnombre, agregarcorreo, agregaruser, agregarpassword } = req.body;
     if (!agregarpassword || !agregarnombre || !agregarcorreo || !agregaruser) {
   return res.status(400).json({ success: false, message: "La contraseña es obligatoria" });
 }
-
 
     const hashedPassword = bcrypt.hashSync(agregarpassword, 10);
   const sql = "INSERT INTO entrenador (Nombre_Entrenador, Correo, username, password) VALUES (?,?,?,?)";
@@ -404,7 +405,6 @@ app.put("/api/entrenadores/:id_entrenador", (req, res) => {
   });
 });
 
-
 // Eliminar entrenador
 app.delete("/api/entrenadores/:id_entrenador", (req, res) => {
   const { id_entrenador } = req.params;
@@ -413,8 +413,13 @@ app.delete("/api/entrenadores/:id_entrenador", (req, res) => {
     res.json({ success: true, message: "Entrenador eliminado" });
   });
 });
-app.listen(3000,()=>{
-    console.log('el servidor esta corriendo en http://localhost:3000');
+
+// ======================================================
+// INICIAR SERVIDOR
+// ======================================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor funcionando en http://localhost:3000 ${PORT}`);
+    console.log(`📧 Correo configurado: ${process.env.SMTP_USER}`);
+    console.log(`🗄️ Base de datos: ${process.env.DB_NAME}`);
 });
-
-

@@ -1,71 +1,96 @@
-// Public: public/js/script.js
-// Requisitos: este script asume que tu formulario tiene id="inscripcionForm"
-// y que el nombre del plan se coloca en el span con id="nombre-plan"
+// public/js/formindex.js
 
-const form = document.getElementById('inscripcionForm');
-const planSpan = document.getElementById('nombre-plan');
+let planSeleccionado = '';
 
-function mapPlanToTable(plan) {
-  const p = plan?.toLowerCase?.().trim() || '';
-  if (p.includes('básico') || p.includes('basico') || p === 'básico' || p === 'basico' || p === 'basic') return 'clientebasico';
-  if (p.includes('acompañamiento') || p.includes('acompanamiento') || p === 'acompañamiento' || p === 'acompanamiento' || p === 'acom') return 'clienteacom';
-  if (p.includes('semi') || p.includes('semi personalizado') || p.includes('semi personalizado')) return 'clientesemi';
-  if (p.includes('personalizado') || p.includes('personalizado') || p === 'personalizado' || p === 'perso') return 'clienteperso';
-  return 'clientebasico';
+// Función para mostrar el formulario
+function mostrarFormulario(plan) {
+    planSeleccionado = plan;
+    document.getElementById('nombre-plan').textContent = plan;
+    document.getElementById('formulario-inscripcion').style.display = 'block';
 }
 
-async function postSignup(payload) {
-  const res = await fetch('/api/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  return res;
+// Función para cerrar el formulario
+function cerrarFormulario() {
+    document.getElementById('formulario-inscripcion').style.display = 'none';
+    document.getElementById('inscripcionForm').reset();
+    planSeleccionado = '';
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const nombre = form.nombre.value.trim();
-  const email = form.email.value.trim();
-  const edad = parseInt(form.edad.value, 10) || null;
-  const sexo = form.sexo.value;
-  const salud = form.salud.value.trim();
-  const objetivos = form.objetivos.value.trim();
-  const plan = planSpan.textContent.trim();
-
-  // Validaciones básicas
-  if (!nombre || !email || !sexo || !plan) {
-    alert('Por favor completa los campos requeridos.');
-    return;
-  }
-
-  const table = mapPlanToTable(plan);
-
-  const payload = {
-    table,
-    name: nombre,
-    email,
-    edad,
-    sexo,
-    condicionesmedicas: salud,
-    trainingob: objetivos,
-    planName: plan
-  };
-
-  try {
-    const res = await postSignup(payload);
-    const json = await res.json();
-    if (res.ok && json.ok) {
-      alert('Inscripción enviada correctamente. Gracias.');
-      form.reset();
-      document.getElementById('formulario-inscripcion').style.display = 'none';
-    } else {
-      console.error('Error respuesta backend', json);
-      alert('Ocurrió un error al enviar la inscripción. Intenta de nuevo.');
+// Función para enviar el formulario al servidor
+async function enviarFormulario() {
+    const form = document.getElementById('inscripcionForm');
+    
+    // Validaciones básicas
+    if (!planSeleccionado) {
+        alert('Error: No se ha seleccionado un plan');
+        return;
     }
-  } catch (err) {
-    console.error(err);
-    alert('No se pudo conectar al servidor. Revisa la consola.');
-  }
+
+    // Obtener valores del formulario
+    const datos = {
+        plan: planSeleccionado,
+        nombre: form.nombre.value.trim(),
+        email: form.email.value.trim(),
+        edad: form.edad.value ? parseInt(form.edad.value) : null,
+        sexo: form.sexo.value, // ← ESTA LÍNEA CAPTURA EL SEXO
+        salud: form.salud.value.trim(),
+        objetivos: form.objetivos.value.trim()
+    };
+
+    // Validar campos requeridos
+    if (!datos.nombre || !datos.email || !datos.sexo) {
+        alert('Por favor completa todos los campos requeridos: Nombre, Email y Sexo');
+        return;
+    }
+
+    // Validar que el sexo sea válido
+    if (datos.sexo !== 'Masculino' && datos.sexo !== 'Femenino') {
+        alert('Por favor selecciona un sexo válido');
+        return;
+    }
+
+    // Mostrar loading
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/inscripcion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datos)
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.success) {
+            alert('¡Inscripción enviada correctamente! Te contactaremos pronto.');
+            cerrarFormulario();
+        } else {
+            alert('Error: ' + (resultado.error || 'No se pudo enviar la inscripción'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión. Intenta nuevamente.');
+    } finally {
+        // Restaurar botón
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('inscripcionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            enviarFormulario();
+        });
+    }
+
+    console.log('Formulario de inscripción inicializado');
 });

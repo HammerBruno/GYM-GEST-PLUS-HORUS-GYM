@@ -116,31 +116,74 @@
 
   </div>
 
-  <!-- JS para formulario -->
   <script>
+    let planSeleccionado = '';
+
     function mostrarFormulario(plan) {
-      document.getElementById('nombre-plan').textContent = plan;
-      document.getElementById('formulario-inscripcion').style.display = 'block';
+        planSeleccionado = plan;
+        document.getElementById('nombre-plan').textContent = plan;
+        document.getElementById('formulario-inscripcion').style.display = 'block';
     }
 
     function cerrarFormulario() {
-      document.getElementById('formulario-inscripcion').style.display = 'none';
+        document.getElementById('formulario-inscripcion').style.display = 'none';
+        document.getElementById('inscripcionForm').reset();
     }
 
-    document.getElementById('inscripcionForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      const nombre = this.nombre.value;
-      const plan = document.getElementById('nombre-plan').textContent;
-      alert('¡Gracias ' + nombre + '! Te has inscrito al plan ' + plan + '.');
-      cerrarFormulario();
-      this.reset();
+    // Cargar el script de formulario correctamente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elimina el event listener anterior y usa este
+        const form = document.getElementById('inscripcionForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                enviarFormulario();
+            });
+        }
     });
-  </script>
+
+    async function enviarFormulario() {
+        const form = document.getElementById('inscripcionForm');
+        const formData = new FormData(form);
+        
+        const datos = {
+            plan: planSeleccionado,
+            nombre: formData.get('nombre'),
+            email: formData.get('email'),
+            edad: formData.get('edad'),
+            sexo: formData.get('sexo'),
+            salud: formData.get('salud'),
+            objetivos: formData.get('objetivos')
+        };
+
+        try {
+            const response = await fetch('/api/inscripcion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.success) {
+                alert('¡Inscripción enviada correctamente! Te contactaremos pronto.');
+                cerrarFormulario();
+            } else {
+                alert('Error: ' + (resultado.error || 'No se pudo enviar la inscripción'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error de conexión. Intenta nuevamente.');
+        }
+    }
+</script>
 
   <script type="module">
-    import { cargarNavBar } from "./public/js/layout.js";
+    import { cargarNavBar } from "js/layout.js";
     cargarNavBar();
   </script>
-  <script>"js/formindex.js"</script>
+  <script>src="js/formindex.js"</script>
 </body>
 </html>
