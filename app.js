@@ -19,7 +19,9 @@ app.use(express.static(path.join(__dirname,'public')));
 /*correo*/
 
 const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
         user: 'horusgymserviceemail@gmail.com',
         pass: 'upyf cgwa vgaf khnh' // usar app password
@@ -155,22 +157,13 @@ const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'gymdb',
+  database: process.env.DB_NAME || 'gymgestplus',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 };
 
-// Transportador nodemailer (SMTP)
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: Number(process.env.SMTP_PORT) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+
 
 // Mapeo permitido de tablas (evita inyección por table name)
 const ALLOWED_TABLES = new Set(['clientebasico','clienteacom','clientesemi','clienteperso']);
