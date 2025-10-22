@@ -1,0 +1,392 @@
+/* Estilos generales */
+body {
+  background-color: #1c1c1c;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #2e2e2e;
+  border-radius: 20px;
+  padding: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+h2 {
+  color: rgb(255, 0, 0);
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 2rem;
+  padding-bottom: 15px;
+  border-bottom: 2px solid red;
+}
+
+/* Botón personalizado */
+.btn-per {
+  background-color: #1e1d1d;
+  color: red;
+  border: 2px solid red;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 30px;
+  display: block;
+  width: 100%;
+  max-width: 350px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-per:hover {
+  background-color: #353232;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+}
+
+/* CONTENEDOR DE TABLA - Adaptado al HTML existente */
+.table-responsive {
+  background-color: #1e1d1d;
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 25px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Indicador de scroll */
+.scroll-alert {
+  background: linear-gradient(90deg, red, #ff4444);
+  color: white;
+  text-align: center;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  animation: alert-pulse 2s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+}
+
+.scroll-alert::before {
+  content: "⬅️";
+  font-size: 1.3rem;
+}
+
+.scroll-alert::after {
+  content: "➡️";
+  font-size: 1.3rem;
+}
+
+@keyframes alert-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
+  }
+}
+
+/* TABLA EXISTENTE - Solo modificamos colores y scroll */
+.table {
+  width: 100%;
+  min-width: 1100px; /* Ancho ajustado para 11 columnas */
+  background-color: #1e1d1d !important;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+/* SOLO LOS ENCABEZADOS EN ROJO */
+.table-dark th {
+  color: red !important; /* SOLO ENCABEZADOS EN ROJO */
+  background-color: #1a1a1a !important;
+  border-bottom: 2px solid red !important;
+  padding: 15px 8px;
+  text-align: center;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* LAS CELDAS NORMALES EN BLANCO */
+.table-dark td {
+  color: #fff !important; /* TEXTO BLANCO EN CELDAS */
+  background-color: #1e1d1d !important;
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid #444 !important;
+  vertical-align: middle;
+}
+
+/* ANCHOS COMPACTOS PARA 11 COLUMNAS (Acompañamiento) */
+.table-dark th:nth-child(1),
+.table-dark td:nth-child(1) { /* ID */
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+.table-dark th:nth-child(2),
+.table-dark td:nth-child(2) { /* Nombre */
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.table-dark th:nth-child(3),
+.table-dark td:nth-child(3) { /* Email */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.table-dark th:nth-child(4),
+.table-dark td:nth-child(4) { /* Edad */
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+.table-dark th:nth-child(5),
+.table-dark td:nth-child(5) { /* Sexo */
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.table-dark th:nth-child(6),
+.table-dark td:nth-child(6) { /* Condiciones Médicas */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.table-dark th:nth-child(7),
+.table-dark td:nth-child(7) { /* Objetivos de Entrenamiento */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.table-dark th:nth-child(8),
+.table-dark td:nth-child(8) { /* Ficha Antropométrica */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.table-dark th:nth-child(9),
+.table-dark td:nth-child(9) { /* Plan de Entrenamiento */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.table-dark th:nth-child(10),
+.table-dark td:nth-child(10) { /* Entrenador Asignado */
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+}
+
+.table-dark th:nth-child(11),
+.table-dark td:nth-child(11) { /* Acciones */
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+/* Efectos hover */
+.table-dark tbody tr:hover td {
+  background-color: #353232 !important;
+}
+
+/* SCROLLBAR personalizado */
+.table-responsive::-webkit-scrollbar {
+  height: 14px;
+  background: #1e1d1d;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #1e1d1d;
+  border-radius: 8px;
+  margin: 0 10px;
+  border: 2px solid #444;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: red;
+  border-radius: 8px;
+  border: 2px solid #1e1d1d;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #ff3333;
+}
+
+/* Modales */
+.modal-content {
+  background-color: #2e2e2e;
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+  max-width: 95vw;
+  margin: 0 auto;
+}
+
+.modal-header {
+  border-bottom: 2px solid red;
+  padding: 25px;
+  background-color: #1e1d1d;
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-title {
+  color: red;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  border-top: 2px solid #444;
+  padding: 20px;
+  background-color: #1e1d1d;
+  border-radius: 0 0 20px 20px;
+}
+
+/* Campos de formulario */
+.form-control {
+  background-color: #1e1d1d;
+  border: 1px solid #444;
+  border-radius: 20px;
+  color: #fff;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  max-width: 100%;
+}
+
+.form-control:focus {
+  background-color: #1e1d1d;
+  border-color: red;
+  color: #fff;
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25);
+}
+
+.form-control::placeholder {
+  color: #888;
+}
+
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Botones */
+.btn-success {
+  background-color: #198754;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b;
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  border-radius: 15px;
+  padding: 6px 12px;
+  margin: 0 3px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  min-width: 70px;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  .container {
+    padding: 20px 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 1.7rem;
+    margin-bottom: 20px;
+  }
+  
+  .btn-per {
+    padding: 12px 25px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .table-responsive {
+    padding: 15px;
+  }
+  
+  .scroll-alert {
+    font-size: 1rem;
+    padding: 10px;
+  }
+  
+  .table {
+    font-size: 0.8rem;
+  }
+  
+  .table-dark th,
+  .table-dark td {
+    padding: 10px 6px;
+  }
+}
