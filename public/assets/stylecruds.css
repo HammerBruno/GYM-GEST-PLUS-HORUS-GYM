@@ -64,47 +64,10 @@ h2 {
     overflow: hidden;
 }
 
-/* Indicador de scroll MUY VISIBLE */
-.scroll-alert {
-    background: linear-gradient(90deg, red, #ff4444);
-    color: white;
-    text-align: center;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    animation: alert-pulse 2s infinite;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-}
 
-.scroll-alert::before {
-    content: "⬅️";
-    font-size: 1.3rem;
-}
 
-.scroll-alert::after {
-    content: "➡️";
-    font-size: 1.3rem;
-}
 
-@keyframes alert-pulse {
 
-    0%,
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-    }
-
-    50% {
-        transform: scale(1.02);
-        box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
-    }
-}
 
 /* Tabla compacta con scroll forzado */
 .table-scroll-container {
