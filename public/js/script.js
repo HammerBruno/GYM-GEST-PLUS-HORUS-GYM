@@ -50,7 +50,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
  if (res.ok) {
       // Registro correcto → redirigir al gym
       setTimeout(() => {
-        window.location.href = "gym.html"; // cambiar
+        window.location.href = "inscripcion.html"; // cambiar
       }, 1500);
     }
   } catch (err) {
