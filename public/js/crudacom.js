@@ -1,65 +1,49 @@
-// Función para calcular IMC
-function calcularIMC(peso, altura) {
-    if (!peso || !altura || altura === 0) return '-';
-    const alturaMetros = altura / 100;
-    return (peso / (alturaMetros * alturaMetros)).toFixed(1);
-}
-
-// Cargar clientes semi personalizado
-function cargaClientesSemi() {
-  fetch("/api/clientesemi")
+// Cargar clientes acompañamiento
+function cargaClientesAcom() {
+  fetch("/api/clienteacom")
     .then(res => res.json())
     .then(data => {
-      const tabla = document.getElementById("tablaClientesSemi");
+      const tabla = document.getElementById("tablaClientesAcom");
       tabla.innerHTML = '';
       data.forEach(cliente => {
-        const imc = calcularIMC(cliente.peso, cliente.altura);
         tabla.innerHTML += `
           <tr>
             <td>${cliente.id}</td>
             <td>${cliente.name}</td>
             <td>${cliente.email}</td>
-            <td>${cliente.edad || '-'}</td>
+            <td>${cliente.edad}</td>
             <td>${cliente.sexo}</td>
-            <td>${cliente.peso || '-'}</td>
-            <td>${cliente.altura || '-'}</td>
-            <td>${imc}</td>
-            <td>${cliente.condicionesmedicas || ''}</td>
-            <td>${cliente.trainingob || ''}</td>
-            <td>${cliente.antropometrics || ''}</td>
-            <td>${cliente.trainingplan || ''}</td>
-            <td>${cliente.eatplan || ''}</td>
-            <td>${cliente.assignedcoach || ''}</td>
+            <td>${cliente.condicionesmedicas}</td>
+            <td>${cliente.trainingob}</td>
+            <td>${cliente.antropometrics}</td>
+            <td>${cliente.trainingplan}</td>
+            <td>${cliente.assignedcoach}</td>
             <td>
-              <button class="btn btn-warning btn-sm" onclick="editarClienteSemi(${cliente.id})">Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarClienteSemi(${cliente.id})">Eliminar</button>
+              <button class="btn btn-warning btn-sm" onclick="editarClienteAcom(${cliente.id})">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarClienteAcom(${cliente.id})">Eliminar</button>
             </td>
           </tr>
         `;
       });
-    })
-    .catch(error => console.error('Error cargando clientes semi personalizado:', error));
+    });
 }
 
-// Agregar cliente semi personalizado
-document.getElementById("formAgregarSemi").addEventListener("submit", async e => {
+// Agregar cliente acompañamiento
+document.getElementById("formAgregarAcom").addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.target;
   const formData = new FormData(form);
   const datos = {
-    name: formData.get('nombreSemi'),
-    email: formData.get('emailSemi'),
-    edad: formData.get('edadSemi'),
-    sexo: formData.get('sexoSemi'),
-    peso: formData.get('pesoSemi'),
-    altura: formData.get('alturaSemi'),
-    condicionesmedicas: formData.get('condicionesSemi'),
-    trainingob: formData.get('objetivosSemi'),
-    antropometrics: formData.get('fichaSemi'),
-    trainingplan: formData.get('planEntrenamientoSemi'),
-    eatplan: formData.get('planNutricionSemi'),
-    assignedcoach: formData.get('entrenadorSemi')
+    name: formData.get('nombreAcom'),
+    email: formData.get('emailAcom'),
+    edad: formData.get('edadAcom'),
+    sexo: formData.get('sexoAcom'),
+    condicionesmedicas: formData.get('condicionesAcom'),
+    trainingob: formData.get('objetivosAcom'),
+    antropometrics: formData.get('fichaAcom'),
+    trainingplan: formData.get('planEntrenamientoAcom'),
+    assignedcoach: formData.get('entrenadorAcom')
   };
 
   // Validar campos obligatorios
@@ -68,116 +52,79 @@ document.getElementById("formAgregarSemi").addEventListener("submit", async e =>
     return;
   }
 
-  try {
-    const response = await fetch("/api/clientesemi", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
-    });
-
-    if (response.ok) {
+  fetch("/api/clienteacom", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos)
+  }).then(res => {
+    if (res.ok) {
       form.reset();
-      bootstrap.Modal.getInstance(document.getElementById("modalAgregarSemi")).hide();
-      cargaClientesSemi();
-      alert("Cliente semi personalizado agregado correctamente");
+      bootstrap.Modal.getInstance(document.getElementById("modalAgregarAcom")).hide();
+      cargaClientesAcom();
     } else {
-      alert("Error al agregar cliente semi personalizado");
+      alert("Error al agregar cliente.");
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert("Error de conexión");
-  }
+  });
 });
 
-// Editar cliente semi personalizado
-function editarClienteSemi(id) {
-  fetch(`/api/clientesemi/${id}`)
+// Editar cliente acompañamiento
+function editarClienteAcom(id) {
+  fetch(`/api/clienteacom/${id}`)
     .then(res => res.json())
     .then(cliente => {
-      document.querySelector("#formEditarSemi input[name='idSemi']").value = cliente.id;
-      document.querySelector("#formEditarSemi input[name='editNombreSemi']").value = cliente.name;
-      document.querySelector("#formEditarSemi input[name='editEmailSemi']").value = cliente.email;
-      document.querySelector("#formEditarSemi input[name='editEdadSemi']").value = cliente.edad || '';
-      document.querySelector("#formEditarSemi select[name='editSexoSemi']").value = cliente.sexo;
-      document.querySelector("#formEditarSemi input[name='editPesoSemi']").value = cliente.peso || '';
-      document.querySelector("#formEditarSemi input[name='editAlturaSemi']").value = cliente.altura || '';
-      document.querySelector("#formEditarSemi textarea[name='editCondicionesSemi']").value = cliente.condicionesmedicas || '';
-      document.querySelector("#formEditarSemi textarea[name='editObjetivosSemi']").value = cliente.trainingob || '';
-      document.querySelector("#formEditarSemi textarea[name='editFichaSemi']").value = cliente.antropometrics || '';
-      document.querySelector("#formEditarSemi textarea[name='editPlanEntrenamientoSemi']").value = cliente.trainingplan || '';
-      document.querySelector("#formEditarSemi textarea[name='editPlanNutricionSemi']").value = cliente.eatplan || '';
-      document.querySelector("#formEditarSemi input[name='editEntrenadorSemi']").value = cliente.assignedcoach || '';
+      document.querySelector("#formEditarAcom input[name='idAcom']").value = cliente.id;
+      document.querySelector("#formEditarAcom input[name='editNombreAcom']").value = cliente.name;
+      document.querySelector("#formEditarAcom input[name='editEmailAcom']").value = cliente.email;
+      document.querySelector("#formEditarAcom input[name='editEdadAcom']").value = cliente.edad;
+      document.querySelector("#formEditarAcom select[name='editSexoAcom']").value = cliente.sexo;
+      document.querySelector("#formEditarAcom textarea[name='editCondicionesAcom']").value = cliente.condicionesmedicas;
+      document.querySelector("#formEditarAcom textarea[name='editObjetivosAcom']").value = cliente.trainingob;
+      document.querySelector("#formEditarAcom textarea[name='editFichaAcom']").value = cliente.antropometrics;
+      document.querySelector("#formEditarAcom textarea[name='editPlanEntrenamientoAcom']").value = cliente.trainingplan;
+      document.querySelector("#formEditarAcom input[name='editEntrenadorAcom']").value = cliente.assignedcoach;
 
-      const modal = new bootstrap.Modal(document.getElementById("modalEditarSemi"));
+      const modal = new bootstrap.Modal(document.getElementById("modalEditarAcom"));
       modal.show();
-    })
-    .catch(error => console.error('Error cargando cliente:', error));
+    });
 }
 
-document.getElementById("formEditarSemi").addEventListener("submit", async e => {
+document.getElementById("formEditarAcom").addEventListener("submit", e => {
   e.preventDefault();
   const form = e.target;
   const formData = new FormData(form);
-  const id = formData.get('idSemi');
-  
+  const id = formData.get('idAcom');
   const datos = {
-    name: formData.get('editNombreSemi'),
-    email: formData.get('editEmailSemi'),
-    edad: formData.get('editEdadSemi'),
-    sexo: formData.get('editSexoSemi'),
-    peso: formData.get('editPesoSemi'),
-    altura: formData.get('editAlturaSemi'),
-    condicionesmedicas: formData.get('editCondicionesSemi'),
-    trainingob: formData.get('editObjetivosSemi'),
-    antropometrics: formData.get('editFichaSemi'),
-    trainingplan: formData.get('editPlanEntrenamientoSemi'),
-    eatplan: formData.get('editPlanNutricionSemi'),
-    assignedcoach: formData.get('editEntrenadorSemi')
+    name: formData.get('editNombreAcom'),
+    email: formData.get('editEmailAcom'),
+    edad: formData.get('editEdadAcom'),
+    sexo: formData.get('editSexoAcom'),
+    condicionesmedicas: formData.get('editCondicionesAcom'),
+    trainingob: formData.get('editObjetivosAcom'),
+    antropometrics: formData.get('editFichaAcom'),
+    trainingplan: formData.get('editPlanEntrenamientoAcom'),
+    assignedcoach: formData.get('editEntrenadorAcom')
   };
 
-  // Validar campos obligatorios
-  if (!datos.name || !datos.email || !datos.sexo) {
-    alert("Nombre, email y sexo son obligatorios.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/clientesemi/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
-    });
-
-    if (response.ok) {
-      bootstrap.Modal.getInstance(document.getElementById("modalEditarSemi")).hide();
-      cargaClientesSemi();
-      alert("Cliente semi personalizado actualizado correctamente");
+  fetch(`/api/clienteacom/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos)
+  }).then(res => {
+    if (res.ok) {
+      bootstrap.Modal.getInstance(document.getElementById("modalEditarAcom")).hide();
+      cargaClientesAcom();
     } else {
-      alert("Error al actualizar cliente semi personalizado");
+      alert("Error al actualizar cliente.");
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert("Error de conexión");
-  }
+  });
 });
 
-// Eliminar cliente semi personalizado
-function eliminarClienteSemi(id) {
-  if (confirm("¿Eliminar este cliente semi personalizado?")) {
-    fetch(`/api/clientesemi/${id}`, { method: "DELETE" })
-      .then(res => {
-        if (res.ok) {
-          cargaClientesSemi();
-          alert("Cliente semi personalizado eliminado correctamente");
-        } else {
-          alert("Error al eliminar cliente semi personalizado");
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert("Error de conexión");
-      });
+// Eliminar cliente acompañamiento
+function eliminarClienteAcom(id) {
+  if (confirm("¿Eliminar este cliente de acompañamiento?")) {
+    fetch(`/api/clienteacom/${id}`, { method: "DELETE" })
+      .then(() => cargaClientesAcom());
   }
 }
 
-cargaClientesSemi();
+cargaClientesAcom();
