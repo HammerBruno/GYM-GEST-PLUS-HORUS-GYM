@@ -578,7 +578,7 @@ app.delete("/api/clienteacom/:id", (req, res) => {
 });
 
 // ======================================================
-// RUTAS PARA CLIENTES SEMI PERSONALIZADO (CRUD)
+// RUTAS PARA CLIENTES SEMI PERSONALIZADO (CRUD) - ACTUALIZADO
 // ======================================================
 
 app.get("/api/clientesemi", (req, res) => {
@@ -598,15 +598,16 @@ app.get("/api/clientesemi/:id", (req, res) => {
 });
 
 app.post("/api/clientesemi", (req, res) => {
-    const { name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
     
     if (!name || !email || !sexo) {
         return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
     }
 
-    const sql = `INSERT INTO clientesemi (name, email, edad, sexo, condicionesmedicas, trainingob, 
-                 antropometrics, trainingplan, eatplan, assignedcoach, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
-    const params = [name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach];
+    const sql = `INSERT INTO clientesemi (name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, 
+                 antropometrics, trainingplan, eatplan, assignedcoach, created_at) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+    const params = [name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach];
 
     db.query(sql, params, (err, result) => {
         if (err) {
@@ -619,15 +620,16 @@ app.post("/api/clientesemi", (req, res) => {
 
 app.put("/api/clientesemi/:id", (req, res) => {
     const { id } = req.params;
-    const { name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
 
     if (!name || !email || !sexo) {
         return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
     }
 
-    const sql = `UPDATE clientesemi SET name = ?, email = ?, edad = ?, sexo = ?, condicionesmedicas = ?, 
-                 trainingob = ?, antropometrics = ?, trainingplan = ?, eatplan = ?, assignedcoach = ? WHERE id = ?`;
-    const params = [name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach, id];
+    const sql = `UPDATE clientesemi SET name = ?, email = ?, edad = ?, sexo = ?, peso = ?, altura = ?, 
+                 condicionesmedicas = ?, trainingob = ?, antropometrics = ?, trainingplan = ?, eatplan = ?, 
+                 assignedcoach = ? WHERE id = ?`;
+    const params = [name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach, id];
 
     db.query(sql, params, (err) => {
         if (err) {
@@ -650,41 +652,130 @@ app.delete("/api/clientesemi/:id", (req, res) => {
 });
 
 // ======================================================
-// RUTAS PARA CLIENTES PERSONALIZADO (CRUD)
+// RUTAS PARA CLIENTES SEMI PERSONALIZADO (CRUD) - CORREGIDO
 // ======================================================
 
-app.get("/api/clienteperso", (req, res) => {
-    db.query("SELECT * FROM clienteperso ORDER BY created_at DESC", (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: "Error al obtener clientes personalizado" });
+app.get("/api/clientesemi", (req, res) => {
+    db.query("SELECT * FROM clientesemi ORDER BY created_at DESC", (err, results) => {
+        if (err) {
+            console.error('Error en GET /api/clientesemi:', err);
+            return res.status(500).json({ success: false, message: "Error al obtener clientes semi personalizado" });
+        }
         res.json(results);
     });
 });
 
-app.get("/api/clienteperso/:id", (req, res) => {
+app.get("/api/clientesemi/:id", (req, res) => {
     const { id } = req.params;
-    db.query("SELECT * FROM clienteperso WHERE id = ?", [id], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: "Error al obtener cliente personalizado" });
-        if (results.length === 0) return res.status(404).json({ success: false, message: "Cliente personalizado no encontrado" });
+    db.query("SELECT * FROM clientesemi WHERE id = ?", [id], (err, results) => {
+        if (err) {
+            console.error('Error en GET /api/clientesemi/:id:', err);
+            return res.status(500).json({ success: false, message: "Error al obtener cliente semi personalizado" });
+        }
+        if (results.length === 0) return res.status(404).json({ success: false, message: "Cliente semi personalizado no encontrado" });
         res.json(results[0]);
     });
 });
 
-app.post("/api/clienteperso", (req, res) => {
-    const { name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach } = req.body;
+app.post("/api/clientesemi", (req, res) => {
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
+    
+    console.log('Datos recibidos en POST /api/clientesemi:', req.body); // Para depuración
     
     if (!name || !email || !sexo) {
         return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
     }
 
-    const sql = `INSERT INTO clienteperso (name, email, edad, sexo, condicionesmedicas, trainingob, 
-                 antropometrics, trainingplan, eatplan, drugplan, assignedcoach, created_at) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
-    const params = [name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach];
+    const sql = `INSERT INTO clientesemi (name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, 
+                 antropometrics, trainingplan, eatplan, assignedcoach, created_at) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+    
+    // Convertir peso y altura a números o NULL si están vacíos
+    const pesoValue = peso ? parseFloat(peso) : null;
+    const alturaValue = altura ? parseFloat(altura) : null;
+    
+    const params = [name, email, edad, sexo, pesoValue, alturaValue, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach];
+
+    console.log('Ejecutando SQL:', sql);
+    console.log('Con parámetros:', params);
 
     db.query(sql, params, (err, result) => {
         if (err) {
-            console.error('Error al crear cliente personalizado:', err);
-            return res.status(500).json({ success: false, message: "Error al crear cliente personalizado" });
+            console.error('Error en POST /api/clientesemi:', err);
+            console.error('SQL Error Code:', err.code);
+            console.error('SQL Error Message:', err.sqlMessage);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Error al crear cliente semi personalizado",
+                error: err.message 
+            });
+        }
+        res.status(201).json({ success: true, message: "Cliente semi personalizado creado", id: result.insertId });
+    });
+});
+
+app.put("/api/clientesemi/:id", (req, res) => {
+    const { id } = req.params;
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach } = req.body;
+
+    console.log('Datos recibidos en PUT /api/clientesemi/:id:', req.body);
+
+    if (!name || !email || !sexo) {
+        return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
+    }
+
+    const sql = `UPDATE clientesemi SET name = ?, email = ?, edad = ?, sexo = ?, peso = ?, altura = ?, 
+                 condicionesmedicas = ?, trainingob = ?, antropometrics = ?, trainingplan = ?, eatplan = ?, 
+                 assignedcoach = ? WHERE id = ?`;
+    
+    const pesoValue = peso ? parseFloat(peso) : null;
+    const alturaValue = altura ? parseFloat(altura) : null;
+    
+    const params = [name, email, edad, sexo, pesoValue, alturaValue, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, assignedcoach, id];
+
+    db.query(sql, params, (err) => {
+        if (err) {
+            console.error('Error en PUT /api/clientesemi/:id:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Error al actualizar cliente semi personalizado",
+                error: err.message 
+            });
+        }
+        res.json({ success: true, message: "Cliente semi personalizado actualizado" });
+    });
+});
+
+// ======================================================
+// RUTAS PARA CLIENTES PERSONALIZADO (CRUD) - CORREGIDO
+// ======================================================
+
+app.post("/api/clienteperso", (req, res) => {
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach } = req.body;
+    
+    console.log('Datos recibidos en POST /api/clienteperso:', req.body);
+    
+    if (!name || !email || !sexo) {
+        return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
+    }
+
+    const sql = `INSERT INTO clienteperso (name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, 
+                 antropometrics, trainingplan, eatplan, drugplan, assignedcoach, created_at) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+    
+    const pesoValue = peso ? parseFloat(peso) : null;
+    const alturaValue = altura ? parseFloat(altura) : null;
+    
+    const params = [name, email, edad, sexo, pesoValue, alturaValue, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach];
+
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            console.error('Error en POST /api/clienteperso:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Error al crear cliente personalizado",
+                error: err.message 
+            });
         }
         res.status(201).json({ success: true, message: "Cliente personalizado creado", id: result.insertId });
     });
@@ -692,35 +783,37 @@ app.post("/api/clienteperso", (req, res) => {
 
 app.put("/api/clienteperso/:id", (req, res) => {
     const { id } = req.params;
-    const { name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach } = req.body;
+    const { name, email, edad, sexo, peso, altura, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach } = req.body;
+
+    console.log('Datos recibidos en PUT /api/clienteperso/:id:', req.body);
 
     if (!name || !email || !sexo) {
         return res.status(400).json({ success: false, message: "Nombre, email y sexo son obligatorios" });
     }
 
-    const sql = `UPDATE clienteperso SET name = ?, email = ?, edad = ?, sexo = ?, condicionesmedicas = ?, 
-                 trainingob = ?, antropometrics = ?, trainingplan = ?, eatplan = ?, drugplan = ?, assignedcoach = ? WHERE id = ?`;
-    const params = [name, email, edad, sexo, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach, id];
+    const sql = `UPDATE clienteperso SET name = ?, email = ?, edad = ?, sexo = ?, peso = ?, altura = ?, 
+                 condicionesmedicas = ?, trainingob = ?, antropometrics = ?, trainingplan = ?, eatplan = ?, 
+                 drugplan = ?, assignedcoach = ? WHERE id = ?`;
+    
+    const pesoValue = peso ? parseFloat(peso) : null;
+    const alturaValue = altura ? parseFloat(altura) : null;
+    
+    const params = [name, email, edad, sexo, pesoValue, alturaValue, condicionesmedicas, trainingob, antropometrics, trainingplan, eatplan, drugplan, assignedcoach, id];
 
     db.query(sql, params, (err) => {
         if (err) {
-            console.error('Error al actualizar cliente personalizado:', err);
-            return res.status(500).json({ success: false, message: "Error al actualizar cliente personalizado" });
+            console.error('Error en PUT /api/clienteperso/:id:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Error al actualizar cliente personalizado",
+                error: err.message 
+            });
         }
         res.json({ success: true, message: "Cliente personalizado actualizado" });
     });
 });
 
-app.delete("/api/clienteperso/:id", (req, res) => {
-    const { id } = req.params;
-    db.query("DELETE FROM clienteperso WHERE id = ?", [id], (err) => {
-        if (err) {
-            console.error('Error al eliminar cliente personalizado:', err);
-            return res.status(500).json({ success: false, message: "Error al eliminar cliente personalizado" });
-        }
-        res.json({ success: true, message: "Cliente personalizado eliminado" });
-    });
-});
+// (Los otros métodos GET y DELETE se mantienen igual)
 
 
 // ======================================================

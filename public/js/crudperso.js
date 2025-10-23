@@ -1,3 +1,10 @@
+// Función para calcular IMC
+function calcularIMC(peso, altura) {
+    if (!peso || !altura || altura === 0) return '-';
+    const alturaMetros = altura / 100;
+    return (peso / (alturaMetros * alturaMetros)).toFixed(1);
+}
+
 // Cargar clientes personalizado
 function cargaClientesPerso() {
   fetch("/api/clienteperso")
@@ -6,13 +13,17 @@ function cargaClientesPerso() {
       const tabla = document.getElementById("tablaClientesPerso");
       tabla.innerHTML = '';
       data.forEach(cliente => {
+        const imc = calcularIMC(cliente.peso, cliente.altura);
         tabla.innerHTML += `
           <tr>
             <td>${cliente.id}</td>
             <td>${cliente.name}</td>
             <td>${cliente.email}</td>
-            <td>${cliente.edad}</td>
+            <td>${cliente.edad || '-'}</td>
             <td>${cliente.sexo}</td>
+            <td>${cliente.peso || '-'}</td>
+            <td>${cliente.altura || '-'}</td>
+            <td>${imc}</td>
             <td>${cliente.condicionesmedicas || ''}</td>
             <td>${cliente.trainingob || ''}</td>
             <td>${cliente.antropometrics || ''}</td>
@@ -42,6 +53,8 @@ document.getElementById("formAgregarPerso").addEventListener("submit", async e =
     email: formData.get('emailPerso'),
     edad: formData.get('edadPerso'),
     sexo: formData.get('sexoPerso'),
+    peso: formData.get('pesoPerso'),
+    altura: formData.get('alturaPerso'),
     condicionesmedicas: formData.get('condicionesPerso'),
     trainingob: formData.get('objetivosPerso'),
     antropometrics: formData.get('fichaPerso'),
@@ -86,8 +99,10 @@ function editarClientePerso(id) {
       document.querySelector("#formEditarPerso input[name='idPerso']").value = cliente.id;
       document.querySelector("#formEditarPerso input[name='editNombrePerso']").value = cliente.name;
       document.querySelector("#formEditarPerso input[name='editEmailPerso']").value = cliente.email;
-      document.querySelector("#formEditarPerso input[name='editEdadPerso']").value = cliente.edad;
+      document.querySelector("#formEditarPerso input[name='editEdadPerso']").value = cliente.edad || '';
       document.querySelector("#formEditarPerso select[name='editSexoPerso']").value = cliente.sexo;
+      document.querySelector("#formEditarPerso input[name='editPesoPerso']").value = cliente.peso || '';
+      document.querySelector("#formEditarPerso input[name='editAlturaPerso']").value = cliente.altura || '';
       document.querySelector("#formEditarPerso textarea[name='editCondicionesPerso']").value = cliente.condicionesmedicas || '';
       document.querySelector("#formEditarPerso textarea[name='editObjetivosPerso']").value = cliente.trainingob || '';
       document.querySelector("#formEditarPerso textarea[name='editFichaPerso']").value = cliente.antropometrics || '';
@@ -113,6 +128,8 @@ document.getElementById("formEditarPerso").addEventListener("submit", async e =>
     email: formData.get('editEmailPerso'),
     edad: formData.get('editEdadPerso'),
     sexo: formData.get('editSexoPerso'),
+    peso: formData.get('editPesoPerso'),
+    altura: formData.get('editAlturaPerso'),
     condicionesmedicas: formData.get('editCondicionesPerso'),
     trainingob: formData.get('editObjetivosPerso'),
     antropometrics: formData.get('editFichaPerso'),
