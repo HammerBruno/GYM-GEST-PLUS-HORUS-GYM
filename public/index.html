@@ -1,189 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>index</title>
-  <link rel="stylesheet" href="assets/style1.css"> <!-- Enlaza tu CSS -->
+  <link rel="stylesheet" href="assets/style2.css">
 </head>
 <body>
 
+<div id="Lanavbar"></div>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Horus</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="index.html">Inicio <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Sobre nosotros</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="Login.html">Login y registro</a>
-      </li>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-
-  <!-- CONTENEDOR PRINCIPAL -->
-  <div class="container">
-
  
+  <div class="container">
+    <div class="left-side"></div> 
 
-    <!-- HERO -->
-    <div class="hero">
-      <h1>Bienvenido a Horus</h1>
-      <p>Transforma tu cuerpo y mente con nuestros entrenamientos personalizados. Únete hoy y empieza tu camino hacia una vida más saludable.</p>
-    </div>
-
-    <!-- SECCIÓN DE PLANES -->
-    <div class="section">
-      <h2>Planes Horus</h2>
-      <div class="cards">
-
-        <!-- Plan Básico -->
-        <div class="card">
-          <img src="https://images.pexels.com/photos/416778/pexels-photo-416778.jpeg" alt="Plan Básico">
-          <h3>Básico</h3>
-          <p>Uso de las instrucciones y equipos.</p>
-          <button class="inscribirse-btn" onclick="mostrarFormulario('Básico')">Inscribirse</button>
+    <div class="right-side">
+      <div class="logo-text">
+        <div class="circle">
+          <!--URL de logo-->
+          <img src="https://copilot.microsoft.com/th/id/BCO.61461743-4dde-4489-ba72-9edd4e0c2df8.png" alt="Logo Gym" />
         </div>
+        <span>Horus</span>
+      </div>
 
-        <!-- Plan Acompañamiento -->
-        <div class="card">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPDi-8l6O8gG74SJcCYT4KmaVxaBRe_LK75yEkT35Rdz161oofT8HQ5x7l9OXN6cW0klc&usqp=CAU" alt="Plan Acompañamiento">
-          <h3>Acompañamiento</h3>
-          <p>Incluye ficha de antropometría, plan de entrenamiento y guía del instructor.</p>
-          <button class="inscribirse-btn" onclick="mostrarFormulario('Acompañamiento')">Inscribirse</button>
-        </div>
+      <div class="form-container">
+        <h2>Bienvenido de vuelta</h2>
 
-        <!-- Plan Semi Personalizado -->
-        <div class="card">
-          <img src="https://co.fitness24seven.com/media/gpskprjz/pt-konsultation.png?cc=0,0.2059608394851961,0,0.349703223014804&width=750&height=500&v=1da6c1a71b29750" alt="Plan Semi Personalizado">
-          <h3>Semi Personalizado</h3>
-          <p>Incluye ficha de antropometría, plan de entrenamiento, plan de nutrición y acompañamiento permanente del instructor.</p>
-          <button class="inscribirse-btn" onclick="mostrarFormulario('Semi Personalizado')">Inscribirse</button>
-        </div>
+        <!-- Login (visible al inicio) -->
+        <form id="login-form">
+          <input type="text" id="log-username" placeholder="Usuario" required />
+          <input type="password" id="log-password" placeholder="Contraseña" required />
+          <div class="password-container">
+            <span class="password-toggle" onclick="togglePassword('password', this)">Mostrar contraseña</span>
+          </div>
+          <button type="submit">Iniciar sesión</button>
+          <span class="toggle-link" onclick="window.location.href='forgot.html'">¿Olvidaste tu contraseña?</span>
+          <button type="button" onclick="mostrarRegistro()">Regístrate</button>
+          <p id="login-msg"></p>
+        </form>
 
-        <!-- Plan Personalizado -->
-        <div class="card">
-          <img src="https://media.istockphoto.com/id/2075354173/es/foto/una-pareja-de-fitness-est%C3%A1-haciendo-kettlebell-twist-en-un-gimnasio-juntos.jpg?s=612x612&w=0&k=20&c=hptIYXejVvbO3Z1agU2YoZofeBPLCCI9mi_3V82zbWE=" alt="Plan Personalizado">
-          <h3>Personalizado</h3>
-          <p>Incluye ficha de antropometría, plan de entrenamiento, plan de nutrición, guía y plan farmacología, entrenador personal.</p>
-          <button class="inscribirse-btn" onclick="mostrarFormulario('Personalizado')">Inscribirse</button>
-        </div>
+        <!-- Registro (oculto al inicio) -->
+        <form id="registro-form" class="oculto">
+          <input type="text" name="nombre" id="nombre" placeholder="Nombre completo" required />
+          <input type="email" name="email" id="email" placeholder="Correo electrónico" required />
+          <input type="text" name="user" id="user" placeholder="Usuario" required />
+          <input type="password" name="password" id="password" placeholder="Contraseña" required />
+          <div class="password-container">
+        <!--    <span class="password-toggle" onclick="togglePassword('reg-password', this)">Mostrar contraseña</span>-->
+          </div>
+          <button type="submit">Registrarse</button>
+          <span class="toggle-link" onclick="mostrarLogin()">¿Ya tienes cuenta? Inicia sesión</span>
+          <p id="registro-msg"></p>
+        </form>
 
+        <!-- Recuperar contraseña (oculto al inicio) -->
+        <form id="recuperar-form" class="oculto">
+          <input type="email" placeholder="Correo electrónico" required />
+          <button type="submit">Recuperar contraseña</button>
+          <span class="toggle-link" onclick="mostrarLogin()">Volver al inicio</span>
+        </form>
       </div>
     </div>
-
-    <!-- FORMULARIO DE INSCRIPCIÓN -->
-    <div id="formulario-inscripcion" class="formulario-oculto">
-      <h2>Inscríbete a tu plan</h2>
-      <form id="inscripcionForm">
-        <p><strong>Plan:</strong> <span id="nombre-plan"></span></p>
-        <input type="text" name="nombre" placeholder="Nombre completo" required>
-        <input type="email" name="email" placeholder="Correo electrónico" required>
-        <input type="number" name="edad" placeholder="Edad" min="10" max="100" required>
-        
-        <!-- Selección de sexo solo con Masculino y Femenino -->
-        <select name="sexo" required>
-          <option value="" disabled selected>Sexo</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-        </select>
-
-        <textarea name="salud" placeholder="Condiciones médicas, alergias o lesiones (opcional)"></textarea>
-        <textarea name="objetivos" placeholder="Objetivos de entrenamiento (opcional)"></textarea>
-        <button type="submit">Enviar Inscripción</button>
-        <button type="button" onclick="cerrarFormulario()">Cancelar</button>
-      </form>
-    </div>
-
-    <!-- BOTÓN FLOTANTE WHATSAPP -->
-    <a href="https://wa.me/573000000000" target="_blank" class="btn-whatsapp">💬</a>
-
-    <!-- FOOTER -->
-    <footer>
-      &copy; 2025 Horus. Todos los derechos reservados.
-    </footer>
-
   </div>
 
-  <script>
-    let planSeleccionado = '';
-
-    function mostrarFormulario(plan) {
-        planSeleccionado = plan;
-        document.getElementById('nombre-plan').textContent = plan;
-        document.getElementById('formulario-inscripcion').style.display = 'block';
-    }
-
-    function cerrarFormulario() {
-        document.getElementById('formulario-inscripcion').style.display = 'none';
-        document.getElementById('inscripcionForm').reset();
-    }
-
-    // Cargar el script de formulario correctamente
-    document.addEventListener('DOMContentLoaded', function() {
-        // Elimina el event listener anterior y usa este
-        const form = document.getElementById('inscripcionForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                enviarFormulario();
-            });
-        }
-    });
-
-    async function enviarFormulario() {
-        const form = document.getElementById('inscripcionForm');
-        const formData = new FormData(form);
-        
-        const datos = {
-            plan: planSeleccionado,
-            nombre: formData.get('nombre'),
-            email: formData.get('email'),
-            edad: formData.get('edad'),
-            sexo: formData.get('sexo'),
-            salud: formData.get('salud'),
-            objetivos: formData.get('objetivos')
-        };
-
-        try {
-            const response = await fetch('/api/inscripcion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(datos)
-            });
-
-            const resultado = await response.json();
-
-            if (resultado.success) {
-                alert('¡Inscripción enviada correctamente! Te contactaremos pronto.');
-                cerrarFormulario();
-            } else {
-                alert('Error: ' + (resultado.error || 'No se pudo enviar la inscripción'));
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error de conexión. Intenta nuevamente.');
-        }
-    }
-</script>
-
-  <script type="module">
-    import { cargarNavBar } from "js/layout.js";
-    cargarNavBar();
-  </script>
-  <script>src="js/formindex.js"</script>
+  <script src="js/script.js"></script>
 </body>
 </html>

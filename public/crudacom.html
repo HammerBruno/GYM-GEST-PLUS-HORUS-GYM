@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="assets/stylecruds.css">
 </head>
 <body>
+  <div id="Lanavbar"></div>
   <div class="container mt-4">
     <h2>Clientes Acompañamiento</h2>
     <button class="btn btn-per mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregarAcom">Agregar Cliente Acompañamiento</button>
@@ -165,5 +166,14 @@
   </div>
 
   <script src="/js/crudacom.js"></script>
+
+  <script type="module">
+    import { cargarNavBar } from "./js/layout.js";
+    cargarNavBar();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  
 </body>
 </html>

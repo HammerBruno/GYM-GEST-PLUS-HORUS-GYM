@@ -11,15 +11,8 @@
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav>
-    <div class="logo">
-      <div class="circle">
-        <img src="https://copilot.microsoft.com/th/id/BCO.61461743-4dde-4489-ba72-9edd4e0c2df8.png" alt="Logo Horus">
-      </div>
-      <span>Horus</span>
-    </div>
-  </nav>
+   <div id="Lanavbar"></div>
+  
 
   <!-- Contenedor Principal -->
   <div class="container">
@@ -82,6 +75,16 @@
   </div>
 
   <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { cargarNavBar } from "./js/layout.js";
+    cargarNavBar();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+
+    
 </body>
 
 </html>

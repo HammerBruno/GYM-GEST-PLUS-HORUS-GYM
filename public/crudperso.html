@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="assets/stylecruds.css"> <!-- CORREGIDO: sin 's' -->
 </head>
 <body>
+  <div id="Lanavbar"></div>
   <div class="container mt-4">
     <h2>Clientes Personalizado</h2>
     <button class="btn btn-per mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregarPerso">Agregar Cliente Personalizado</button>
@@ -201,5 +202,13 @@
   </div>
 
   <script src="/js/crudperso.js"></script>
+  <script type="module">
+    import { cargarNavBar } from "./js/layout.js";
+    cargarNavBar();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  
 </body>
 </html>
